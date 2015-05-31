@@ -1,166 +1,127 @@
+#include "logger.h"
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include <iostream>
-#include <memory>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <vector>
+#include <string>
 
 using namespace std;
 
-const auto SCREEN_X = 640;
-const auto SCREEN_Y = 480;
+const string vertex_shader(R"(
+#version 400
+in vec3 vp;
+void main() {
+    gl_Position = vec4(vp, 1.0);
+}
+)");
 
-auto surface_destroyer  = [](auto&& surface)    {SDL_FreeSurface(surface);};
-auto texture_destroyer  = [](auto&& texture)    {SDL_DestroyTexture(texture);};
-auto renderer_destroyer = [](auto&& renderer)   {SDL_DestroyRenderer(renderer);};
-auto window_destroyer   = [](auto&& window)     {SDL_DestroyWindow(window);};
+const string fragment_shader(R"(
+#version 400
+out vec4 frag_color;
+void main() {
+    frag_color = vec4(0.5, 0.0, 0.5, 1.0);
+}
+)");
 
-using Surface   = unique_ptr<SDL_Surface,   decltype(surface_destroyer)>;
-using Texture   = unique_ptr<SDL_Texture,   decltype(texture_destroyer)>;
-using Renderer  = unique_ptr<SDL_Renderer,  decltype(renderer_destroyer)>;
-using Window    = unique_ptr<SDL_Window,    decltype(window_destroyer)>;
+Logger logger;
 
-auto load_surface(const std::string & path)
-{
-    Surface surface(
-            IMG_Load(path.c_str()),
-            surface_destroyer);
-
-    if (surface == nullptr)
-        cout << "failed to load surface: " << IMG_GetError() << endl;
-
-    return surface;
+void error_callback(int error, const char * description) {
+    logger.log_err("error ", error, ": ", description);
 }
 
-auto load_surface_optimized
-(   const std::string & path
-,   const SDL_PixelFormat & format
-)
-{
-    auto surface = load_surface(path);
-
-    if (surface == nullptr)
-        return surface;
-
-    Surface optimized(
-            SDL_ConvertSurface(surface.get(), &format, 0),
-            surface_destroyer);
-
-    if (optimized == nullptr)
-        cout << "failed to optimize surface: " << SDL_GetError() << endl;
-
-    return optimized;
-}
-
-auto load_texture(const std::string & path, SDL_Renderer & renderer)
-{
-    auto surface = load_surface(path);
-
-    if (surface == nullptr)
-        return Texture(nullptr, texture_destroyer);
-
-    Texture texture(
-            SDL_CreateTextureFromSurface(&renderer, surface.get()),
-            texture_destroyer);
-
-    if (texture == nullptr)
-        cout << "failed to create texture: " << SDL_GetError() << endl;
-
-    return texture;
-}
-
-int main(int argc, char * args[])
-{
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        cout << "could not init sdl: " << SDL_GetError() << endl;
-        return 1;
+void key_callback(GLFWwindow * window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
     }
+}
 
-    //  This scope makes sure that the smart pointers inside are destructed
-    //  BEFORE we call the _Quit() functions.
+struct __Window {
+    template<typename T>
+    inline void operator()(T && t) const {glfwDestroyWindow(t);}
+};
+using Window = unique_ptr<GLFWwindow, __Window>;
+
+int main() {
+    logger.restart();
+    logger.log_err("starting...");
+    logger.log_err("GLFW version: ", glfwGetVersionString());
+
+    glfwSetErrorCallback(error_callback);
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
+
+    glfwWindowHint(GLFW_SAMPLES, 4);
+
     {
-        Window window(
-                SDL_CreateWindow(
-                    "SDL Tutorial",
-                    SDL_WINDOWPOS_UNDEFINED,
-                    SDL_WINDOWPOS_UNDEFINED,
-                    SCREEN_X,
-                    SCREEN_Y,
-                    SDL_WINDOW_SHOWN),
-                window_destroyer);
-
-        if (window == nullptr)
-        {
-            cout << "could not create window" << endl;
-            return 1;
+        Window window(glfwCreateWindow(512, 512, "asteroids", nullptr, nullptr));
+        if (window == nullptr) {
+            glfwTerminate();
+            exit(EXIT_FAILURE);
         }
 
-        Renderer renderer(
-                SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED),
-                renderer_destroyer);
+        glfwMakeContextCurrent(window.get());
+        glfwSwapInterval(1);
 
-        if (renderer == nullptr)
-        {
-            cout << "could not create renderer: " << SDL_GetError() << endl;
-            return 1;
-        }
+        glfwSetKeyCallback(window.get(), key_callback);
 
-        auto img_flags = IMG_INIT_PNG;
-        if (! (IMG_Init(img_flags)) & img_flags)
-        {
-            cout << "could not init image handling: " << IMG_GetError() << endl;
-            return 1;
-        }
+        glewExperimental = GL_TRUE;
+        glewInit();
 
-        auto & surface = *SDL_GetWindowSurface(window.get());
-        auto image = load_texture("loaded.png", *renderer);
+        logger.log_err("Renderer: ", glGetString(GL_RENDERER));
+        logger.log_err("OpenGL version: ", glGetString(GL_VERSION));
 
-        if (image == nullptr)
-            return 1;
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
 
-        auto quit = false;
-        while (! quit)
-        {
-            SDL_Event e;
-            while (SDL_PollEvent(&e) != 0)
-                switch (e.type)
-                {
-                    case SDL_QUIT:
-                        quit = true;
-                        break;
+        vector<float> points {0, 0.5, 0, 0.5, -0.5, 0, -0.5, -0.5, 0};
 
-                    default:
-                        break;
-                }
+        GLuint vbo = 0;
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(decltype(points)::value_type), points.data(), GL_STATIC_DRAW);
 
+        GLuint vao = 0;
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-            SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
-            SDL_RenderClear(renderer.get());
+        auto vertex_shader_ptr      = vertex_shader.c_str();
+        auto fragment_shader_ptr    = fragment_shader.c_str();
 
-            SDL_Rect fill_rect = {SCREEN_X / 4, SCREEN_Y / 4, SCREEN_X / 2, SCREEN_Y / 2};
-            SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0x00, 0x00, 0xFF);
-            SDL_RenderFillRect(renderer.get(), &fill_rect);
+        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fs, 1, &fragment_shader_ptr, nullptr);
+        glCompileShader(fs);
 
-            SDL_Rect outline_rect = {SCREEN_X / 6, SCREEN_Y / 6, SCREEN_X * 2 / 3, SCREEN_Y * 2 / 3};
-            SDL_SetRenderDrawColor(renderer.get(), 0x00, 0xFF, 0x00, 0xFF);
-            SDL_RenderDrawRect(renderer.get(), &outline_rect);
+        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vs, 1, &vertex_shader_ptr, nullptr);
+        glCompileShader(vs);
 
-            SDL_SetRenderDrawColor(renderer.get(), 0x00, 0x00, 0xFF, 0xFF);
-            SDL_RenderDrawLine(renderer.get(), 0, SCREEN_Y / 2, SCREEN_X, SCREEN_Y / 2);
+        GLuint shader_program = glCreateProgram();
+        glAttachShader(shader_program, fs);
+        glAttachShader(shader_program, vs);
+        glLinkProgram(shader_program);
 
-            SDL_SetRenderDrawColor(renderer.get(), 0xFF, 0xFF, 0x00, 0xFF);
-            for (auto i = 0; i < SCREEN_Y; i += 4)
-                SDL_RenderDrawPoint(renderer.get(), SCREEN_X / 2, i);
+        while (!glfwWindowShouldClose(window.get())) {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glUseProgram(shader_program);
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
 
-            /*
-            SDL_RenderCopy(renderer.get(), image.get(), nullptr, nullptr);
-            */
-
-            SDL_RenderPresent(renderer.get());
+            glfwSwapBuffers(window.get());
+            glfwPollEvents();
         }
     }
 
-    IMG_Quit();
-    SDL_Quit();
-
-    return 0;
+    glfwTerminate();
 }
