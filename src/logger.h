@@ -9,20 +9,19 @@
 
 class Logger {
 public:
-    Logger();
-    Logger(const std::string & logfile);
+    Logger() = delete;
 
-    void restart() const;
+    static void restart();
 
     template<typename... Ts>
-    void log(Ts&&... ts) {
+    static void log(Ts&&... ts) {
         auto str = get_string(ts...);
         std::ofstream of(fname, std::ofstream::app);
         of << str << std::flush;
     }
 
     template<typename... Ts>
-    void log_err(Ts&&... ts) {
+    static void log_err(Ts&&... ts) {
         auto str = get_string(ts...);
         std::ofstream of(fname, std::ofstream::app);
         of << str << std::flush;
@@ -30,10 +29,10 @@ public:
     }
 
 private:
-    std::string fname;
+    static const std::string fname;
 
     template<typename... Ts>
-    std::string get_string(Ts&&... ts) {
+    static std::string get_string(Ts&&... ts) {
         std::stringstream ss;
         auto t0 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         auto t1 = localtime(&t0);
@@ -44,12 +43,12 @@ private:
     }
 
     template<typename T>
-    void build_string(std::stringstream & ss, T && t) {
+    static void build_string(std::stringstream & ss, T && t) {
         ss << t;
     }
 
     template<typename T, typename... Ts>
-    void build_string(std::stringstream & ss, T && t, Ts... ts) {
+    static void build_string(std::stringstream & ss, T && t, Ts... ts) {
         ss << t;
         build_string(ss, ts...);
     }

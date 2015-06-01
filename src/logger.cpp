@@ -3,18 +3,8 @@
 using namespace std;
 using namespace std::chrono;
 
-Logger::Logger(const string & logfile):
-    fname(logfile)
-{
-
-}
-
-Logger::Logger():
-    Logger("gl.log")
-{
-
-}
-
-void Logger::restart() const {
+void Logger::restart() {
     ofstream of(fname, ofstream::trunc);
 }
+
+const string Logger::fname("gl.log");
