@@ -51,7 +51,7 @@ struct __Window {
 using Window = unique_ptr<GLFWwindow, __Window>;
 
 void log_params() {
-    map<GLenum, string> int_params = {
+    vector<pair<GLenum, string>> int_params = {
         {GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS    , "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS"},
         {GL_MAX_CUBE_MAP_TEXTURE_SIZE           , "GL_MAX_CUBE_MAP_TEXTURE_SIZE"},
         {GL_MAX_DRAW_BUFFERS                    , "GL_MAX_DRAW_BUFFERS"},
@@ -64,11 +64,11 @@ void log_params() {
         {GL_MAX_VERTEX_UNIFORM_COMPONENTS       , "GL_MAX_VERTEX_UNIFORM_COMPONENTS"},
     };
 
-    map<GLenum, string> two_int_params = {
+    vector<pair<GLenum, string>> two_int_params = {
         {GL_MAX_VIEWPORT_DIMS                   , "GL_MAX_VIEWPORT_DIMS"},
     };
 
-    map <GLenum, string> bool_params = {
+    vector<pair<GLenum, string>> bool_params = {
         {GL_STEREO                              , "GL_STEREO"},
     };
 
@@ -95,6 +95,110 @@ void log_params() {
     Logger::log("--------------------------------");
 }
 
+template<typename T>
+void print_info_log(GLuint shader, T func) {
+    char log[2048];
+    auto length = 0;
+    func(shader, sizeof(log), &length, log);
+    if (length) {
+        Logger::log("info log for index ", shader, ":");
+        Logger::log(log);
+    }
+}
+
+template<typename T, typename U>
+auto check_gl(GLuint item, GLenum flag, T a, U b) {
+    auto params = -1;
+    a(item, flag, &params);
+    if (params != GL_TRUE) {
+        Logger::log_err("ERROR: GL index ", item);
+        print_info_log(item, b);
+        return false;
+    }
+    return true;
+}
+
+auto check_shader(GLuint item) {
+    return check_gl(item, GL_COMPILE_STATUS, glGetShaderiv, glGetShaderInfoLog);
+}
+
+auto check_program(GLuint item) {
+    return check_gl(item, GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog);
+}
+
+template<typename T, typename U>
+void print_params(GLuint item, int params, T a, U b) {
+    const map<GLenum, string> type_strings = {
+        {GL_BOOL                    , "GL_BOOL"},
+        {GL_INT                     , "GL_INT"},
+        {GL_FLOAT                   , "GL_FLOAT"},
+        {GL_FLOAT_VEC2              , "GL_FLOAT_VEC2"},
+        {GL_FLOAT_VEC3              , "GL_FLOAT_VEC3"},
+        {GL_FLOAT_VEC4              , "GL_FLOAT_VEC4"},
+        {GL_FLOAT_MAT2              , "GL_FLOAT_MAT2"},
+        {GL_FLOAT_MAT3              , "GL_FLOAT_MAT3"},
+        {GL_FLOAT_MAT4              , "GL_FLOAT_MAT4"},
+        {GL_SAMPLER_2D              , "GL_SAMPLER_2D"},
+        {GL_SAMPLER_3D              , "GL_SAMPLER_3D"},
+        {GL_SAMPLER_CUBE            , "GL_SAMPLER_CUBE"},
+        {GL_SAMPLER_2D_SHADOW       , "GL_SAMPLER_2D_SHADOW"},
+    };
+
+    for (auto i = 0; i != params; ++i) {
+        char name[64];
+        auto length = 0;
+        auto size = 0;
+        GLenum type;
+        a(item, i, sizeof(name), &length, &size, &type, name);
+
+        if (size > 1) {
+            for (auto j = 0; j != size; ++j) {
+                stringstream ss;
+                ss << name << "[" << j << "]";
+                int location = b(item, ss.str().c_str());
+                Logger::log(i, " type: ", type_strings.at(type), " name: ", ss.str(), " location: ", location);
+            }
+        } else {
+            int location = b(item, name);
+            Logger::log(i, " type: ", type_strings.at(type), " name: ", name, " location: ", location);
+        }
+    }
+}
+
+void simple_print(GLuint item, const pair<GLenum, string> & i, int & params) {
+    glGetProgramiv(item, i.first, &params);
+    Logger::log(i.second, ": ", params);
+}
+
+void print_all(GLuint item) {
+    Logger::log("--- shader program ", item, " info ---");
+    auto params = -1;
+
+    simple_print(item, {GL_LINK_STATUS         , "GL_LINK_STATUS"},         params);
+    simple_print(item, {GL_ATTACHED_SHADERS    , "GL_ATTACHED_SHADERS"},    params);
+
+    simple_print(item, {GL_ACTIVE_ATTRIBUTES   , "GL_ACTIVE_ATTRIBUTES"},   params);
+    print_params(item, params, glGetActiveAttrib, glGetAttribLocation);
+
+    simple_print(item, {GL_ACTIVE_UNIFORMS     , "GL_ACTIVE_UNIFORMS"},     params);
+    print_params(item, params, glGetActiveUniform, glGetUniformLocation);
+
+    print_info_log(item, glGetProgramInfoLog);
+}
+
+auto verify(GLuint item) {
+    glValidateProgram(item);
+
+    auto params = -1;
+    simple_print(item, {GL_VALIDATE_STATUS, "GL_VALIDATE_STATUS"}, params);
+
+    if (params != GL_TRUE) {
+        print_info_log(item, glGetProgramInfoLog);
+        return false;
+    }
+    return true;
+}
+
 int main() {
     Logger::restart();
     Logger::log_err("starting...");
@@ -114,9 +218,6 @@ int main() {
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     {
-        auto & monitor = *glfwGetPrimaryMonitor();
-        const auto & vmode = glfwGetVideoMode(&monitor);
-
         auto name = "asteroids";
 
         Window window(glfwCreateWindow(win_w, win_h, name, nullptr, nullptr));
@@ -161,15 +262,25 @@ int main() {
         GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fs, 1, &fragment_shader_ptr, nullptr);
         glCompileShader(fs);
+        check_shader(fs);
 
         GLuint vs = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vs, 1, &vertex_shader_ptr, nullptr);
         glCompileShader(vs);
+        check_shader(vs);
 
         GLuint shader_program = glCreateProgram();
         glAttachShader(shader_program, fs);
         glAttachShader(shader_program, vs);
         glLinkProgram(shader_program);
+
+        if (! verify(shader_program)) {
+            glfwTerminate();
+            exit(EXIT_FAILURE);
+        }
+        check_program(shader_program);
+
+        print_all(shader_program);
 
         auto previous_seconds = glfwGetTime();
         auto frame_count = 0;
