@@ -151,3 +151,6 @@ using Vecf4 = Vec<float, 4>;
 using Vecd2 = Vec<double, 2>;
 using Vecd3 = Vec<double, 3>;
 using Vecd4 = Vec<double, 4>;
+using Veci2 = Vec<int, 2>;
+using Veci3 = Vec<int, 3>;
+using Veci4 = Vec<int, 4>;

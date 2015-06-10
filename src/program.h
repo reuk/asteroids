@@ -4,6 +4,8 @@
 
 #include "shader.h"
 
+#include <string>
+
 class Program {
 public:
     Program();
@@ -13,6 +15,10 @@ public:
     void detach(const Shader & s) const;
     void link() const;
     void use() const;
+
+    GLint get_attrib_location(const std::string & name) const;
+
+    bool verify() const;
 
     GLuint get_index() const;
 private:

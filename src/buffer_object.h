@@ -7,20 +7,32 @@
 
 #include "logger.h"
 
-class VBO {
+class BufferObject {
 public:
-    VBO();
-    virtual ~VBO();
+    BufferObject(GLuint type);
+    virtual ~BufferObject();
 
     void bind() const;
 
     template<typename T>
     void data(const std::vector<T> & t, GLuint flag) const {
+        bind();
         glBufferData(GL_ARRAY_BUFFER, t.size() * sizeof(T), t.data(), flag);
     }
 
     GLuint get_index() const;
 
 private:
+    GLuint type;
     GLuint index;
+};
+
+class VBO: public BufferObject {
+public:
+    VBO();
+};
+
+class IBO: public BufferObject {
+public:
+    IBO();
 };
