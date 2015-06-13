@@ -24,17 +24,17 @@ public:
     void error(const std::string & s) override;
     void key(int key, int scancode, int action, int mods) override;
 private:
+    Program shader_program;
+
+    VAO vao;
     VBO geometry;
     VBO colors;
     IBO ibo;
-    VAO vao;
-
     static const std::string vertex_shader;
     static const std::string fragment_shader;
-
-    Program shader_program;
 
     glm::vec2 position;
     glm::vec2 velocity;
     float angle;
+    float aspect;
 };

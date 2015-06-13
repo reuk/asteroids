@@ -16,8 +16,7 @@ Program::Program():
 }
 
 Program::~Program() {
-    if (index)
-        glDeleteProgram(index);
+    glDeleteProgram(index);
 }
 
 void Program::attach(const Shader & s) const {
@@ -44,6 +43,13 @@ GLint Program::get_attrib_location(const std::string & name) const {
     auto ret = glGetAttribLocation(index, name.c_str());
     if (ret == -1)
         Logger::log_err("no such attrib: ", name);
+    return ret;
+}
+
+GLint Program::get_uniform_location(const std::string & name) const {
+    auto ret = glGetUniformLocation(index, name.c_str());
+    if (ret == -1)
+        Logger::log_err("no such uniform: ", name);
     return ret;
 }
 
@@ -126,6 +132,10 @@ auto check_shader(GLuint item) {
 
 auto check_program(GLuint item) {
     return check_gl(item, GL_LINK_STATUS, glGetProgramiv, glGetProgramInfoLog);
+}
+
+bool Program::check() const {
+    return check_program(index);
 }
 
 template<typename T, typename U>

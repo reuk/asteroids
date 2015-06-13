@@ -12,9 +12,11 @@
 using namespace std;
 using namespace glm;
 
-Mover::Mover()
+Mover::Mover():
+    angle(0),
+    aspect(0)
 {
-    vao.bind();
+    //  vao.bind();
 
     //  load shaders
     Shader fs(GL_FRAGMENT_SHADER);
@@ -29,11 +31,10 @@ Mover::Mover()
     shader_program.attach(vs);
     shader_program.link();
 
-    if (! shader_program.verify()) {
-        throw runtime_error("shader program failed to verify");
-    }
+    shader_program.check();
+    shader_program.verify();
 
-    //  load geometry and other buffers
+    //  create buffers
     geometry.data(vector<GLfloat>{
             -1, -1,  1,
              1, -1,  1,
@@ -43,7 +44,6 @@ Mover::Mover()
              1, -1, -1,
              1,  1, -1,
             -1,  1, -1}, GL_STATIC_DRAW);
-
     colors.data(vector<GLfloat>{
             1, 0, 0,
             0, 1, 0,
@@ -53,7 +53,6 @@ Mover::Mover()
             0, 1, 0,
             0, 0, 1,
             1, 1, 1}, GL_STATIC_DRAW);
-
     ibo.data(vector<GLushort>{
             0, 1, 2,
             2, 3, 0,
@@ -68,29 +67,52 @@ Mover::Mover()
             1, 5, 6,
             6, 2, 1}, GL_STATIC_DRAW);
 
+    //  configure vao
+    vao.bind();
+
     auto coord3d = shader_program.get_attrib_location("coord3d");
     glEnableVertexAttribArray(coord3d);
     geometry.bind();
-    glVertexAttribPointer(coord3d, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glVertexAttribPointer(coord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     auto v_color = shader_program.get_attrib_location("v_color");
     glEnableVertexAttribArray(v_color);
     colors.bind();
-    glVertexAttribPointer(v_color, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glVertexAttribPointer(v_color, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     ibo.bind();
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void Mover::update() {
+    auto current_seconds = glfwGetTime();
+    float angle = current_seconds * 45;
 
+    vec3 axis_y(0, 1, 0);
+    auto anim = rotate(mat4(1.0), radians(angle), axis_y);
+
+    auto model = translate(mat4(1.0), vec3(0.0, 0.0, -4.0));
+    auto view = lookAt(vec3(0.0, 2.0, 0.0), vec3(0.0, 0.0, -4.0), vec3(0.0, 1.0, 0.0));
+    auto projection = perspective(45.0f, aspect, 0.1f, 10.0f);
+
+    auto mvp = projection * view * model * anim;
+
+    shader_program.use();
+    glUniformMatrix4fv(shader_program.get_uniform_location("mvp"), 1, GL_FALSE, value_ptr(mvp));
+    glUseProgram(0);
 }
 
 void Mover::draw() const {
     shader_program.use();
+
     vao.bind();
-    auto size = 0;
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
+
+    glBindVertexArray(0);
+    glUseProgram(0);
 }
 
 vec2 Mover::get_position() const { return position; }
@@ -98,7 +120,7 @@ vec2 Mover::get_velocity() const { return velocity; }
 float Mover::get_angle() const { return angle; }
 
 void Mover::resize(const vec2 & v) {
-
+    aspect = v.x / v.y;
 }
 
 void Mover::error(const string & s) {
@@ -106,7 +128,7 @@ void Mover::error(const string & s) {
 }
 
 void Mover::key(int key, int scancode, int action, int mods) {
-    map<int, string> directions = {
+    map<int, string> keys = {
         {GLFW_KEY_W, "forward"},
         {GLFW_KEY_S, "backward"},
         {GLFW_KEY_A, "left"},
@@ -120,7 +142,11 @@ void Mover::key(int key, int scancode, int action, int mods) {
         {GLFW_RELEASE, "stop"},
     };
 
-    Logger::log_err(actions[action], " ", directions[key]);
+    auto d_in = keys.find(key);
+    auto a_in = actions.find(action);
+
+    if (d_in != keys.end() && a_in != actions.end())
+        Logger::log_err(actions[action], " ", keys[key]);
 }
 
 const string Mover::vertex_shader(R"(
@@ -128,8 +154,9 @@ const string Mover::vertex_shader(R"(
 in vec3 coord3d;
 in vec3 v_color;
 out vec3 f_color;
+uniform mat4 mvp;
 void main() {
-    gl_Position = vec4(coord3d, 1.0);
+    gl_Position = mvp * vec4(coord3d, 1.0);
     f_color = v_color;
 }
 )");

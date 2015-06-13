@@ -7,32 +7,36 @@
 
 #include "logger.h"
 
+template<GLuint type>
 class BufferObject {
 public:
-    BufferObject(GLuint type);
-    virtual ~BufferObject();
+    BufferObject():
+        index(0)
+    {
+        glGenBuffers(1, &index);
+    }
 
-    void bind() const;
+    virtual ~BufferObject() {
+        glDeleteBuffers(1, &index);
+    }
+
+    void bind() const {
+        glBindBuffer(type, index);
+    }
 
     template<typename T>
     void data(const std::vector<T> & t, GLuint flag) const {
         bind();
-        glBufferData(GL_ARRAY_BUFFER, t.size() * sizeof(T), t.data(), flag);
+        glBufferData(type, t.size() * sizeof(T), t.data(), flag);
     }
 
-    GLuint get_index() const;
+    GLuint get_index() const {
+        return index;
+    }
 
 private:
-    GLuint type;
     GLuint index;
 };
 
-class VBO: public BufferObject {
-public:
-    VBO();
-};
-
-class IBO: public BufferObject {
-public:
-    IBO();
-};
+using VBO = BufferObject<GL_ARRAY_BUFFER>;
+using IBO = BufferObject<GL_ELEMENT_ARRAY_BUFFER>;

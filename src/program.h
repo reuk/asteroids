@@ -17,7 +17,9 @@ public:
     void use() const;
 
     GLint get_attrib_location(const std::string & name) const;
+    GLint get_uniform_location(const std::string & name) const;
 
+    bool check() const;
     bool verify() const;
 
     GLuint get_index() const;

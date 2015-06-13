@@ -8,7 +8,6 @@
 #include "window.h"
 #include "glfw_app.h"
 #include "listener_list.h"
-#include "vec.h"
 
 #include <string>
 
