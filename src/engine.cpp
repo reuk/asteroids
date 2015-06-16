@@ -14,10 +14,8 @@ using namespace glm;
 
 Mover::Mover():
     angle(0),
-    aspect(0)
+    aspect(1)
 {
-    //  vao.bind();
-
     //  load shaders
     Shader fs(GL_FRAGMENT_SHADER);
     fs.source(fragment_shader);
@@ -70,21 +68,21 @@ Mover::Mover():
     //  configure vao
     vao.bind();
 
-    auto coord3d = shader_program.get_attrib_location("coord3d");
-    glEnableVertexAttribArray(coord3d);
+    auto v_position = shader_program.get_attrib_location("v_position");
+    glEnableVertexAttribArray(v_position);
     geometry.bind();
-    glVertexAttribPointer(coord3d, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(v_position, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     auto v_color = shader_program.get_attrib_location("v_color");
     glEnableVertexAttribArray(v_color);
     colors.bind();
-    glVertexAttribPointer(v_color, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(v_color, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     ibo.bind();
 
+    glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
 
 void Mover::update() {
@@ -101,7 +99,7 @@ void Mover::update() {
     auto mvp = projection * view * model * anim;
 
     shader_program.use();
-    glUniformMatrix4fv(shader_program.get_uniform_location("mvp"), 1, GL_FALSE, value_ptr(mvp));
+    glUniformMatrix4fv(shader_program.get_uniform_location("v_mvp"), 1, GL_FALSE, value_ptr(mvp));
     glUseProgram(0);
 }
 
@@ -151,12 +149,12 @@ void Mover::key(int key, int scancode, int action, int mods) {
 
 const string Mover::vertex_shader(R"(
 #version 400
-in vec3 coord3d;
+in vec3 v_position;
 in vec3 v_color;
 out vec3 f_color;
-uniform mat4 mvp;
+uniform mat4 v_mvp;
 void main() {
-    gl_Position = mvp * vec4(coord3d, 1.0);
+    gl_Position = v_mvp * vec4(v_position, 1.0);
     f_color = v_color;
 }
 )");
