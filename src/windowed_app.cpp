@@ -30,6 +30,8 @@ WindowedApp::WindowedApp() {
 }
 
 void WindowedApp::run() {
+    listener_list.call(&Listener::resize, size);
+
     while (! window.get_should_close()) {
         update();
         draw();

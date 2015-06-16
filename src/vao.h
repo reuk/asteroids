@@ -9,6 +9,7 @@ public:
     virtual ~VAO();
 
     void bind() const;
+    static void unbind();
 
     GLuint get_index() const;
 

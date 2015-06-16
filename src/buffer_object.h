@@ -24,6 +24,10 @@ public:
         glBindBuffer(type, index);
     }
 
+    static void unbind() {
+        glBindBuffer(type, 0);
+    }
+
     template<typename T>
     void data(const std::vector<T> & t, GLuint flag) const {
         bind();

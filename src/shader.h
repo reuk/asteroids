@@ -3,16 +3,38 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <stdexcept>
 
+template<GLuint type>
 class Shader {
 public:
-    Shader(GLuint type);
-    virtual ~Shader();
+    Shader():
+        index(glCreateShader(type))
+    {
+        if (index == 0) {
+            throw std::runtime_error("failed to create shader");
+        }
+    }
 
-    void source(const std::string & src) const;
-    void compile() const;
+    virtual ~Shader() {
+        glDeleteShader(index);
+    }
 
-    GLuint get_index() const;
+    void source(const std::string & src) const {
+        const auto ptr = src.c_str();
+        glShaderSource(index, 1, &ptr, nullptr);
+    }
+
+    void compile() const {
+        glCompileShader(index);
+    }
+
+    GLuint get_index() const {
+        return index;
+    }
 private:
     GLuint index;
 };
+
+using VertexShader = Shader<GL_VERTEX_SHADER>;
+using FragmentShader = Shader<GL_FRAGMENT_SHADER>;

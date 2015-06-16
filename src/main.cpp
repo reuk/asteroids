@@ -4,6 +4,7 @@
 #include "logger.h"
 #include "windowed_app.h"
 #include "engine.h"
+#include "shader_program.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -17,8 +18,10 @@ using namespace glm;
 class Asteroids: public WindowedApp, public WindowedApp::Listener {
 public:
     Asteroids():
+        shader_program(vertex_shader, fragment_shader),
         previous_seconds(glfwGetTime()),
-        frame_count(0)
+        frame_count(0),
+        mover(shader_program)
     {
         Logger::log_err("GLFW version: ", glfwGetVersionString());
         Logger::log_err("Renderer: ", glGetString(GL_RENDERER));
@@ -37,7 +40,7 @@ public:
         auto elapsed_seconds = current_seconds - previous_seconds;
         if (elapsed_seconds > 0.1) {
             previous_seconds = current_seconds;
-            auto fps = static_cast<decltype(elapsed_seconds)>(frame_count) / elapsed_seconds;
+            auto fps = (float)frame_count / elapsed_seconds;
 
             stringstream ss;
             ss << name << " - fps: " << fps;
@@ -51,9 +54,11 @@ public:
     }
 
     void draw() const override {
+        shader_program.use();
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         mover.draw();
+        Program::unuse();
     }
 
     void resize(const vec2 & v) override {
@@ -71,6 +76,11 @@ public:
 private:
     static const string name;
 
+    static const std::string vertex_shader;
+    static const std::string fragment_shader;
+
+    ShaderProgram shader_program;
+
     double previous_seconds;
     unsigned int frame_count;
 
@@ -78,6 +88,27 @@ private:
 };
 
 const string Asteroids::name = "asteroids";
+
+const string Asteroids::vertex_shader(R"(
+#version 400
+in vec3 v_position;
+in vec3 v_color;
+out vec3 f_color;
+uniform mat4 v_mvp;
+void main() {
+    gl_Position = v_mvp * vec4(v_position, 1.0);
+    f_color = v_color;
+}
+)");
+
+const string Asteroids::fragment_shader(R"(
+#version 400
+in vec3 f_color;
+out vec4 frag_color;
+void main() {
+    frag_color = vec4(f_color, 1.0);
+}
+)");
 
 int main() {
     Logger::restart();

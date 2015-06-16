@@ -19,20 +19,16 @@ Program::~Program() {
     glDeleteProgram(index);
 }
 
-void Program::attach(const Shader & s) const {
-    glAttachShader(index, s.get_index());
-}
-
-void Program::detach(const Shader & s) const {
-    glDetachShader(index, s.get_index());
-}
-
 void Program::link() const {
     glLinkProgram(index);
 }
 
 void Program::use() const {
     glUseProgram(index);
+}
+
+void Program::unuse() {
+    glUseProgram(0);
 }
 
 GLuint Program::get_index() const {

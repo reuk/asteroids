@@ -15,6 +15,10 @@ void VAO::bind() const {
     glBindVertexArray(index);
 }
 
+void VAO::unbind() {
+    glBindVertexArray(0);
+}
+
 GLuint VAO::get_index() const {
     return index;
 }
