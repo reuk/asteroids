@@ -90,7 +90,7 @@ private:
 const string Asteroids::name = "asteroids";
 
 const string Asteroids::vertex_shader(R"(
-#version 400
+#version 330
 in vec3 v_position;
 in vec3 v_color;
 out vec3 f_color;
@@ -102,7 +102,7 @@ void main() {
 )");
 
 const string Asteroids::fragment_shader(R"(
-#version 400
+#version 330
 in vec3 f_color;
 out vec4 frag_color;
 void main() {

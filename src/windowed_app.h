@@ -32,8 +32,8 @@ public:
     glm::vec2 get_size() const;
     Window & get_window();
 
-    static void add_listener(Listener * const l);
-    static void remove_listener(Listener * const l);
+    static void add_listener(Listener * l);
+    static void remove_listener(Listener * l);
 
 private:
     static glm::vec2 size;

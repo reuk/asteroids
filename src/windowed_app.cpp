@@ -7,12 +7,10 @@ using namespace glm;
 
 WindowedApp::WindowedApp() {
     set_error_callback(error_callback);
-#ifdef __APPLE__
     window_hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     window_hint(GLFW_CONTEXT_VERSION_MINOR, 2);
     window_hint(GLFW_OPENGL_FORWARD_COMPAT, true);
     window_hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#endif
     window_hint(GLFW_SAMPLES, 4);
 
     window = Window(size.x, size.y, "", nullptr, nullptr);

@@ -34,9 +34,9 @@ private:
     template<typename... Ts>
     static std::string get_string(Ts&&... ts) {
         std::stringstream ss;
-        auto t0 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        auto t1 = localtime(&t0);
-        ss << std::put_time(t1, "%a %b %d %H:%M:%S %Y") << ": ";
+        //auto t0 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        //auto t1 = localtime(&t0);
+        //ss << std::put_time(t1, "%a %b %d %H:%M:%S %Y") << ": ";
         build_string(ss, ts...);
         ss << std::endl;
         return ss.str();

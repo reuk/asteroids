@@ -8,6 +8,8 @@ set(sources main.cpp logger.cpp window.cpp glfw_app.cpp program.cpp vao.cpp wind
 add_executable(${name} ${sources})
 
 find_package(OpenGL REQUIRED)
-find_package(glew REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
 
-target_link_libraries(${name} glfw3 ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
+target_link_libraries(${name} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} ${GLFW_STATIC_LIBRARIES})

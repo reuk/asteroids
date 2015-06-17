@@ -1,5 +1,6 @@
 #include "engine.h"
 
+#define GLM_FORCE_RADIANS
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -49,12 +50,12 @@ void Mover::update() {
 }
 
 void Mover::draw() const {
-    vao.bind();
-
     auto size = 0;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
     auto v_mvp = shader_program.get_uniform_location("v_mvp");
+
+    vao.bind();
 
     for (auto angle = 0; angle != 10; ++angle) {
         glUniformMatrix4fv(v_mvp, 1, GL_FALSE, value_ptr(mvp * rotate(mat4(1), radians(static_cast<float>(glfwGetTime() * angle)), vec3(0, 1, 1))));

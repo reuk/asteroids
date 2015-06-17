@@ -29,7 +29,7 @@ public:
     void get_size(int &, int &) const;
     void set_size(int, int);
     void get_framebuffer_size(int &, int &) const;
-    void get_frame_size(int &, int &, int &, int &) const;
+    //void get_frame_size(int &, int &, int &, int &) const;
     void iconify();
     void restore();
     void show();

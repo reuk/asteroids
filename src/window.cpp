@@ -65,9 +65,9 @@ void Window::get_framebuffer_size(int & a, int & b) const {
     glfwGetFramebufferSize(window.get(), &a, &b);
 }
 
-void Window::get_frame_size(int & a, int & b, int & c, int & d) const {
-    glfwGetWindowFrameSize(window.get(), &a, &b, &c, &d);
-}
+//void Window::get_frame_size(int & a, int & b, int & c, int & d) const {
+//    glfwGetWindowFrameSize(window.get(), &a, &b, &c, &d);
+//}
 
 void Window::iconify() {
     glfwIconifyWindow(window.get());

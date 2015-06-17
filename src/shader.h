@@ -21,7 +21,7 @@ public:
     }
 
     void source(const std::string & src) const {
-        const auto ptr = src.c_str();
+        auto ptr = src.c_str();
         glShaderSource(index, 1, &ptr, nullptr);
     }
 
