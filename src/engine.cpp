@@ -1,6 +1,7 @@
 #include "engine.h"
 
 #define GLM_FORCE_RADIANS
+#include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -13,6 +14,8 @@ using namespace glm;
 
 Mover::Mover(Program & shader_program):
     shader_program(shader_program),
+    position(0),
+    velocity(0),
     angle(0),
     aspect(0)
 {
@@ -22,9 +25,9 @@ Mover::Mover(Program & shader_program):
              1, -1,  0,
             -1, -1,  0}, GL_STATIC_DRAW);
     colors.data(vector<GLfloat>{
-             1,  0,  0,
-             0,  1,  0,
-             0,  0,  1}, GL_STATIC_DRAW);
+             0,  1,  1,
+             0,  1,  1,
+             0,  1,  1}, GL_STATIC_DRAW);
     ibo.data(vector<GLushort>{0, 1, 2}, GL_STATIC_DRAW);
 
     //  configure vao
@@ -46,7 +49,12 @@ Mover::Mover(Program & shader_program):
 }
 
 void Mover::update() {
+    position += velocity;
 
+    position = mod(position + 1.0f, 2.0f) - 1.0f;
+
+    angle += dangle;
+    angle = fmod(angle, static_cast<float>(M_PI * 2));
 }
 
 void Mover::draw() const {
@@ -57,10 +65,8 @@ void Mover::draw() const {
 
     vao.bind();
 
-    for (auto angle = 0; angle != 10; ++angle) {
-        glUniformMatrix4fv(v_mvp, 1, GL_FALSE, value_ptr(mvp * rotate(mat4(1), radians(static_cast<float>(glfwGetTime() * angle)), vec3(0, 1, 1))));
-        glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, nullptr);
-    }
+    glUniformMatrix4fv(v_mvp, 1, GL_FALSE, value_ptr(mvp * translate(mat4(1), vec3(position, 0)) * rotate(mat4(1), angle, vec3(0, 0, 1)) * scale(mat4(1), vec3(0.1))));
+    glDrawElements(GL_LINE_LOOP, size / sizeof(GLushort), GL_UNSIGNED_SHORT, nullptr);
 
     VAO::unbind();
 }
@@ -71,32 +77,40 @@ float Mover::get_angle() const { return angle; }
 
 void Mover::resize(const vec2 & v) {
     aspect = v.x / v.y;
-    mvp = perspective(45.0f, aspect, 0.1f, 10.0f) * lookAt(vec3(0, 0, 0), vec3(0, 0, -4), vec3(0, 1, 0)) * translate(mat4(1), vec3(0, 0, -4));
+    mvp = (
+            perspective(45.0f, aspect, 0.1f, 10.0f) *
+            lookAt(vec3(0, 0, 0), vec3(0, 0, -4), vec3(0, 1, 0)) *
+            translate(mat4(1), vec3(0, 0, -4)));
 }
 
 void Mover::error(const string & s) {
 
 }
 
+vec2 Mover::forward()   const { return rotate(vec2(0, 1), angle) * 0.01f; }
+vec2 Mover::backward()  const { return -forward(); }
+float Mover::left()     const { return 0.01f; }
+float Mover::right()    const { return -left(); }
+
 void Mover::key(int key, int scancode, int action, int mods) {
-    map<int, string> keys = {
-        {GLFW_KEY_W, "forward"},
-        {GLFW_KEY_S, "backward"},
-        {GLFW_KEY_A, "left"},
-        {GLFW_KEY_D, "right"},
-        {GLFW_KEY_SPACE, "shoot"},
+    map<int, decltype(&Mover::forward)> thrusters = {
+        {GLFW_KEY_W, &Mover::forward},
+        {GLFW_KEY_S, &Mover::backward},
     };
 
-    map<int, string> actions = {
-        {GLFW_PRESS, "start"},
-        {GLFW_REPEAT, "continue"},
-        {GLFW_RELEASE, "stop"},
+    auto thrust_in = thrusters.find(key);
+    if (thrust_in != thrusters.end() && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        velocity += (this->*(thrust_in->second))();
+    }
+
+    map<int, decltype(&Mover::left)> rotators = {
+        {GLFW_KEY_A, &Mover::left},
+        {GLFW_KEY_D, &Mover::right},
     };
 
-    auto d_in = keys.find(key);
-    auto a_in = actions.find(action);
-
-    if (d_in != keys.end() && a_in != actions.end())
-        Logger::log_err(actions[action], " ", keys[key]);
+    auto rotate_in = rotators.find(key);
+    if (rotate_in != rotators.end() && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        dangle += (this->*(rotate_in->second))();
+    }
 }
 
