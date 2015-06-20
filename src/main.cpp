@@ -6,6 +6,11 @@
 #include "engine.h"
 #include "shader_program.h"
 
+#define GLM_FORCE_RADIANS
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <stdexcept>
 #include <iostream>
 #include <vector>
@@ -15,24 +20,68 @@
 using namespace std;
 using namespace glm;
 
+class ScreenBoundary: public WindowedApp::Listener, public StaticDrawable {
+public:
+    ScreenBoundary(Program & shader_program):
+        StaticDrawable(
+                shader_program,
+                vector<GLfloat>{
+                         -1, -1,  0,
+                         -1,  1,  0,
+                          1,  1,  0,
+                          1, -1,  0},
+                vector<GLfloat>{
+                          0, 1, 1,
+                          0, 1, 1,
+                          0, 1, 1,
+                          0, 1, 1},
+                vector<GLushort>{0, 1, 2, 3}),
+        shader_program(shader_program)
+    {
+
+    }
+
+    void draw() const override {
+        auto model_matrix = mat4(1);
+
+        glUniformMatrix4fv(shader_program.get_uniform_location("v_model"), 1, GL_FALSE, value_ptr(model_matrix));
+        StaticDrawable::draw();
+    }
+
+    void resize(const glm::vec2 & v) override { aspect = v.x / v.y; }
+    void error(const std::string & s) override {}
+    void key(int key, int scancode, int action, int mods) override {}
+
+private:
+    Program & shader_program;
+    float aspect;
+};
+
 class Asteroids: public WindowedApp, public WindowedApp::Listener {
 public:
     Asteroids():
         shader_program(vertex_shader, fragment_shader),
         previous_seconds(glfwGetTime()),
         frame_count(0),
-        mover(shader_program)
+        screen_boundary(shader_program),
+        ship(shader_program)
     {
-        Logger::log_err("GLFW version: ", glfwGetVersionString());
-        Logger::log_err("Renderer: ", glGetString(GL_RENDERER));
-        Logger::log_err("OpenGL version: ", glGetString(GL_VERSION));
+        Logger::log("GLFW version: ", glfwGetVersionString());
+        Logger::log("Renderer: ", glGetString(GL_RENDERER));
+        Logger::log("OpenGL version: ", glGetString(GL_VERSION));
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
 
         //  register listeners
         add_listener(this);
-        add_listener(&mover);
+        add_listener(&ship);
+        add_listener(&screen_boundary);
+
+        updatable.add(&ship);
+
+        drawable.add(&ship);
+        drawable.add(&screen_boundary);
     }
 
     void update() override {
@@ -50,19 +99,27 @@ public:
         }
         frame_count++;
 
-        mover.update();
+        updatable.call(&Updatable::update);
     }
 
     void draw() const override {
         shader_program.use();
+
+        auto view_matrix = lookAt(vec3(0.0f, 0.0f, 4.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+        glUniformMatrix4fv(shader_program.get_uniform_location("v_view"), 1, GL_FALSE, value_ptr(view_matrix));
+
+        auto projection_matrix = perspective(45.0f, aspect, 0.1f, 10.0f);
+        glUniformMatrix4fv(shader_program.get_uniform_location("v_projection"), 1, GL_FALSE, value_ptr(projection_matrix));
+
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        mover.draw();
+        drawable.call(&Drawable::draw);
         Program::unuse();
     }
 
     void resize(const vec2 & v) override {
         glViewport(0, 0, v.x, v.y);
+        aspect = v.x / v.y;
     }
 
     void error(const std::string & s) override {
@@ -84,7 +141,13 @@ private:
     double previous_seconds;
     unsigned int frame_count;
 
-    Mover mover;
+    float aspect;
+
+    ScreenBoundary screen_boundary;
+    Ship ship;
+
+    ListenerList<Updatable> updatable;
+    ListenerList<Drawable> drawable;
 };
 
 const string Asteroids::name = "asteroids";
@@ -94,9 +157,11 @@ const string Asteroids::vertex_shader(R"(
 in vec3 v_position;
 in vec3 v_color;
 out vec3 f_color;
-uniform mat4 v_mvp;
+uniform mat4 v_model;
+uniform mat4 v_view;
+uniform mat4 v_projection;
 void main() {
-    gl_Position = v_mvp * vec4(v_position, 1.0);
+    gl_Position = v_projection * v_view * v_model * vec4(v_position, 1.0);
     f_color = v_color;
 }
 )");
@@ -112,7 +177,7 @@ void main() {
 
 int main() {
     Logger::restart();
-    Logger::log_err("starting...");
+    Logger::log(__FUNCTION__, " starting...");
 
     try {
         Asteroids asteroids;

@@ -24,7 +24,7 @@ WindowedApp::WindowedApp() {
     window.set_key_callback(key_callback);
     window.set_size_callback(resize_callback);
 
-    Logger::log_err("created window");
+    Logger::log("created window");
 }
 
 void WindowedApp::run() {

@@ -6,19 +6,38 @@
 #include "vao.h"
 #include "buffer_object.h"
 #include "program.h"
+#include "updatable.h"
+#include "drawable.h"
 
 #include <string>
 
-class Mover: public WindowedApp::Listener {
+template<typename T>
+class Mover: public Updatable {
 public:
-    Mover(Program & p);
+    Mover():
+        current(0),
+        delta(0)
+    {}
 
-    void update();
-    void draw() const;
+    virtual ~Mover() = default;
 
-    glm::vec2 get_position() const;
-    glm::vec2 get_velocity() const;
-    float get_angle() const;
+    void update() override { current += delta; }
+    void impulse(const T & t) { delta += t; }
+
+    void set_current(const T & t) { current = t; }
+    T get_current() const { return current; }
+private:
+    T current;
+    T delta;
+};
+
+class Ship: public WindowedApp::Listener, public Updatable, public StaticDrawable {
+public:
+    Ship(Program & p);
+    virtual ~Ship();
+
+    void update() override;
+    void draw() const override;
 
     void resize(const glm::vec2 & v) override;
     void error(const std::string & s) override;
@@ -31,16 +50,9 @@ private:
 
     Program & shader_program;
 
-    VAO vao;
-    VBO geometry;
-    VBO colors;
-    IBO ibo;
+    Mover<glm::vec2> position;
+    Mover<float> angle;
 
-    glm::vec2 position;
-    glm::vec2 velocity;
-    float angle;
-    float dangle;
+    glm::vec4 viewport;
     float aspect;
-
-    glm::mat4 mvp;
 };
