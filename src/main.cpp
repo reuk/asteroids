@@ -105,7 +105,7 @@ public:
     void draw() const override {
         shader_program.use();
 
-        auto view_matrix = lookAt(vec3(0.0f, 0.0f, 4.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+        auto view_matrix = lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
         glUniformMatrix4fv(shader_program.get_uniform_location("v_view"), 1, GL_FALSE, value_ptr(view_matrix));
 
         auto projection_matrix = perspective(45.0f, aspect, 0.1f, 10.0f);

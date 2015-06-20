@@ -16,11 +16,6 @@ public:
         glGenBuffers(1, &index);
     }
 
-    template<typename T>
-    BufferObject(const std::vector<T> & t, GLuint flag) {
-        data(t, flag);
-    }
-
     virtual ~BufferObject() {
         glDeleteBuffers(1, &index);
     }

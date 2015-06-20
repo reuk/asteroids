@@ -7,11 +7,12 @@ StaticDrawable::StaticDrawable(
         const vector<GLfloat> & g,
         const vector<GLfloat> & c,
         const vector<GLushort> & i):
-    geometry(g, GL_STATIC_DRAW),
-    colors(c, GL_STATIC_DRAW),
-    ibo(i, GL_STATIC_DRAW),
     size(i.size())
 {
+    geometry.data(g, GL_STATIC_DRAW);
+    colors.data(c, GL_STATIC_DRAW);
+    ibo.data(i, GL_STATIC_DRAW);
+
     vao.bind();
 
     auto v_position = shader_program.get_attrib_location("v_position");
