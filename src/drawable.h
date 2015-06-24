@@ -8,8 +8,6 @@
 
 class Drawable {
 public:
-    virtual ~Drawable() {}
-
     virtual void draw() const = 0;
 };
 
@@ -21,9 +19,18 @@ public:
             const std::vector<GLfloat> & colors,
             const std::vector<GLushort> & indices);
 
+    StaticDrawable(const StaticDrawable & rhs) = delete;
+    StaticDrawable & operator = (const StaticDrawable & rhs) = delete;
+    StaticDrawable(StaticDrawable && rhs) noexcept;
+    StaticDrawable & operator = (StaticDrawable && rhs) = delete;
+
     void draw() const override;
 
 private:
+    void configure_vao() const;
+
+    Program & shader_program;
+
     VAO vao;
     VBO geometry;
     VBO colors;

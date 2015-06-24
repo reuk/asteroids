@@ -17,4 +17,10 @@ public:
         attach(v);
         link();
     }
+
+    ShaderProgram(const ShaderProgram & rhs) = delete;
+    void operator = (const ShaderProgram & rhs) = delete;
+
+    ShaderProgram(ShaderProgram && rhs) noexcept = default;
+    ShaderProgram & operator = (ShaderProgram && rhs) noexcept = default;
 };

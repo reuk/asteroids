@@ -20,6 +20,12 @@ public:
         glDeleteShader(index);
     }
 
+    Shader(const Shader & rhs) = delete;
+    void operator = (const Shader & rhs) = delete;
+
+    Shader(Shader && rhs) noexcept = default;
+    Shader & operator = (Shader && rhs) noexcept = default;
+
     void source(const std::string & src) const {
         auto ptr = src.c_str();
         glShaderSource(index, 1, &ptr, nullptr);

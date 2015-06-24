@@ -28,6 +28,14 @@ public:
         std::cerr << str << std::flush;
     }
 
+    class ScopedLog {
+    public:
+        ScopedLog(const std::string & t): t(t) { Logger::log_err(t, ": begin"); }
+        virtual ~ScopedLog() { Logger::log_err(t, ": end"); }
+    private:
+        std::string t;
+    };
+
 private:
     static const std::string fname;
 
@@ -53,3 +61,5 @@ private:
         build_string(ss, ts...);
     }
 };
+
+#define LOG_SCOPE Logger::ScopedLog sl_##__COUNTER__(__FUNCTION__);

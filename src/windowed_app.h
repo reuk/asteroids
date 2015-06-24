@@ -15,7 +15,6 @@ class WindowedApp: public GLFWApp {
 public:
     class Listener {
     public:
-        virtual ~Listener() {};
         virtual void resize(const glm::vec2 & v) = 0;
         virtual void error(const std::string & s) = 0;
         virtual void key(int key, int scancode, int action, int mods) = 0;

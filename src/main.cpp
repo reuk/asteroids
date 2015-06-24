@@ -14,13 +14,14 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
+#include <list>
 #include <string>
 #include <map>
 
 using namespace std;
 using namespace glm;
 
-class ScreenBoundary: public WindowedApp::Listener, public StaticDrawable {
+class ScreenBoundary: public StaticDrawable {
 public:
     ScreenBoundary(Program & shader_program):
         StaticDrawable(
@@ -37,27 +38,18 @@ public:
                           0, 1, 1},
                 vector<GLushort>{0, 1, 2, 3}),
         shader_program(shader_program)
-    {
-
-    }
+    {}
 
     void draw() const override {
-        auto model_matrix = mat4(1);
-
-        glUniformMatrix4fv(shader_program.get_uniform_location("v_model"), 1, GL_FALSE, value_ptr(model_matrix));
+        glUniformMatrix4fv(shader_program.get_uniform_location("v_model"), 1, GL_FALSE, value_ptr(mat4(1)));
         StaticDrawable::draw();
     }
 
-    void resize(const glm::vec2 & v) override { aspect = v.x / v.y; }
-    void error(const std::string & s) override {}
-    void key(int key, int scancode, int action, int mods) override {}
-
 private:
     Program & shader_program;
-    float aspect;
 };
 
-class Asteroids: public WindowedApp, public WindowedApp::Listener {
+class Asteroids: public WindowedApp, public WindowedApp::Listener, public Ship::Listener {
 public:
     Asteroids():
         shader_program(vertex_shader, fragment_shader),
@@ -76,12 +68,8 @@ public:
         //  register listeners
         add_listener(this);
         add_listener(&ship);
-        add_listener(&screen_boundary);
 
-        updatable.add(&ship);
-
-        drawable.add(&ship);
-        drawable.add(&screen_boundary);
+        ship.add_listener(this);
     }
 
     void update() override {
@@ -99,7 +87,9 @@ public:
         }
         frame_count++;
 
-        updatable.call(&Updatable::update);
+        ship.update();
+        for (auto && i : bullets)
+            i.update();
     }
 
     void draw() const override {
@@ -113,7 +103,10 @@ public:
 
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        drawable.call(&Drawable::draw);
+        screen_boundary.draw();
+        ship.draw();
+        for (const auto & i : bullets)
+            i.draw();
         Program::unuse();
     }
 
@@ -126,8 +119,10 @@ public:
         Logger::log_err("error: ", s);
     }
 
-    void key(int key, int scancode, int action, int mods) override {
+    void key(int key, int scancode, int action, int mods) override {}
 
+    void ship_gun_fired(Bullet && bullet) override {
+        bullets.emplace_back(move(bullet));
     }
 
 private:
@@ -145,9 +140,8 @@ private:
 
     ScreenBoundary screen_boundary;
     Ship ship;
-
-    ListenerList<Updatable> updatable;
-    ListenerList<Drawable> drawable;
+    vector<Bullet> bullets;
+    // vector<Asteroid> asteroids;
 };
 
 const string Asteroids::name = "asteroids";

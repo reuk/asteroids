@@ -7,7 +7,7 @@
 
 #include "logger.h"
 
-template<GLuint type>
+template<GLuint type, GLuint mode>
 class BufferObject {
 public:
     BufferObject():
@@ -20,6 +20,30 @@ public:
         glDeleteBuffers(1, &index);
     }
 
+    BufferObject(const BufferObject & rhs) = delete;
+    BufferObject & operator = (const BufferObject & rhs) = delete;
+
+    BufferObject(BufferObject && rhs) noexcept:
+        index(0)
+    {
+        glGenBuffers(1, &index);
+
+        auto size = 0;
+
+        glBindBuffer(GL_COPY_READ_BUFFER, rhs.index);
+        glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size);
+
+        glBindBuffer(GL_COPY_WRITE_BUFFER, index);
+        glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, mode);
+
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+
+        glBindBuffer(GL_COPY_READ_BUFFER, 0);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+    }
+
+    BufferObject & operator = (BufferObject && rhs) = delete;
+
     void bind() const {
         glBindBuffer(type, index);
     }
@@ -29,9 +53,9 @@ public:
     }
 
     template<typename T>
-    void data(const std::vector<T> & t, GLuint flag) const {
+    void data(const std::vector<T> & t) const {
         bind();
-        glBufferData(type, t.size() * sizeof(T), t.data(), flag);
+        glBufferData(type, t.size() * sizeof(T), t.data(), mode);
     }
 
     GLuint get_index() const {
@@ -42,5 +66,5 @@ private:
     GLuint index;
 };
 
-using VBO = BufferObject<GL_ARRAY_BUFFER>;
-using IBO = BufferObject<GL_ELEMENT_ARRAY_BUFFER>;
+using VBO = BufferObject<GL_ARRAY_BUFFER, GL_STATIC_DRAW>;
+using IBO = BufferObject<GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW>;
