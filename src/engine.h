@@ -77,22 +77,6 @@ public:
     void error(const std::string & s) override;
     void key(int key, int scancode, int action, int mods) override;
 
-    template<typename T, typename Fun>
-    auto key_callback(const std::map<int, T> & triggers, int key, Fun fun) {
-        auto in = triggers.find(key);
-        if (in != triggers.end()) {
-            fun((this->*(in->second))());
-        }
-    }
-
-    template<typename T>
-    auto key_callback(const std::map<int, T> & triggers, int key) {
-        auto in = triggers.find(key);
-        if (in != triggers.end()) {
-            (this->*(in->second))();
-        }
-    }
-
     void add_listener(Listener * listener);
     void remove_listener(Listener * listener);
 private:
@@ -107,4 +91,14 @@ private:
     std::default_random_engine engine;
     std::uniform_real_distribution<float> angle_distribution;
     std::uniform_real_distribution<float> delta_distribution;
+};
+
+class Asteroid: public SpaceObject {
+public:
+    Asteroid(
+            Program & p,
+            const Mover<glm::vec2> & position = Mover<glm::vec2>(),
+            const Mover<float> & angle = Mover<float>());
+private:
+    static const int POINTS = 10;
 };

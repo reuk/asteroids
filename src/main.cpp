@@ -5,6 +5,7 @@
 #include "windowed_app.h"
 #include "engine.h"
 #include "shader_program.h"
+#include "key_callback.h"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtx/rotate_vector.hpp>
@@ -90,6 +91,8 @@ public:
         ship.update();
         for (auto && i : bullets)
             i.update();
+        for (auto && i : asteroids)
+            i.update();
     }
 
     void draw() const override {
@@ -107,6 +110,8 @@ public:
         ship.draw();
         for (const auto & i : bullets)
             i.draw();
+        for (const auto & i : asteroids)
+            i.draw();
         Program::unuse();
     }
 
@@ -119,7 +124,35 @@ public:
         Logger::log_err("error: ", s);
     }
 
-    void key(int key, int scancode, int action, int mods) override {}
+    void add_asteroid() {
+        default_random_engine engine{random_device()()};
+        uniform_real_distribution<float> pos_dist(-1.0, 1.0);
+
+        vec2 pos(pos_dist(engine), pos_dist(engine));
+
+        uniform_real_distribution<float> dir_dist(0, 2 * M_PI);
+        uniform_real_distribution<float> speed_dist(0.0, 0.01);
+
+        auto direction = dir_dist(engine);
+        auto vel = vec2(sin(direction), cos(direction)) * speed_dist(engine);
+
+        auto ang = dir_dist(engine);
+        auto del = speed_dist(engine);
+
+        asteroids.emplace_back(move(Asteroid(
+                        shader_program,
+                        Mover<vec2>(pos, vel),
+                        Mover<float>(ang, del))));
+    }
+
+    void key(int key, int scancode, int action, int mods) override {
+        if (! (action == GLFW_PRESS || action == GLFW_REPEAT))
+            return;
+
+        key_dispatch<decltype(&Asteroids::add_asteroid)>(this, {
+            {GLFW_KEY_N, &Asteroids::add_asteroid},
+        }, key);
+    }
 
     void ship_gun_fired(Bullet && bullet) override {
         bullets.emplace_back(move(bullet));
@@ -141,7 +174,7 @@ private:
     ScreenBoundary screen_boundary;
     Ship ship;
     vector<Bullet> bullets;
-    // vector<Asteroid> asteroids;
+    vector<Asteroid> asteroids;
 };
 
 const string Asteroids::name = "asteroids";
