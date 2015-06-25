@@ -3,7 +3,10 @@
 
 #include "logger.h"
 #include "windowed_app.h"
-#include "engine.h"
+#include "asteroid.h"
+#include "ship.h"
+#include "bullet.h"
+#include "screen_boundary.h"
 #include "shader_program.h"
 #include "key_callback.h"
 
@@ -21,34 +24,6 @@
 
 using namespace std;
 using namespace glm;
-
-class ScreenBoundary: public StaticDrawable {
-public:
-    ScreenBoundary(Program & shader_program):
-        StaticDrawable(
-                shader_program,
-                vector<GLfloat>{
-                         -1, -1,  0,
-                         -1,  1,  0,
-                          1,  1,  0,
-                          1, -1,  0},
-                vector<GLfloat>{
-                          0, 1, 1,
-                          0, 1, 1,
-                          0, 1, 1,
-                          0, 1, 1},
-                vector<GLushort>{0, 1, 2, 3}),
-        shader_program(shader_program)
-    {}
-
-    void draw() const override {
-        glUniformMatrix4fv(shader_program.get_uniform_location("v_model"), 1, GL_FALSE, value_ptr(mat4(1)));
-        StaticDrawable::draw();
-    }
-
-private:
-    Program & shader_program;
-};
 
 class Asteroids: public WindowedApp, public WindowedApp::Listener, public Ship::Listener {
 public:

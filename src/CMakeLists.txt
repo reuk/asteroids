@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -std=c++1y")
 
 set(name asteroids)
-set(sources main.cpp logger.cpp window.cpp glfw_app.cpp program.cpp vao.cpp windowed_app.cpp engine.cpp drawable.cpp)
+set(sources main.cpp logger.cpp window.cpp glfw_app.cpp program.cpp vao.cpp windowed_app.cpp drawable.cpp asteroid.cpp bullet.cpp ship.cpp space_object.cpp screen_boundary.cpp)
 
 add_executable(${name} ${sources})
 
