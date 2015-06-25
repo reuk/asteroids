@@ -1,6 +1,7 @@
 #include "asteroid.h"
 
 #include <random>
+#include <algorithm>
 
 using namespace std;
 using namespace glm;
