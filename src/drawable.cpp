@@ -17,6 +17,28 @@ StaticDrawable::StaticDrawable(
     configure_vao();
 }
 
+StaticDrawable::StaticDrawable(const StaticDrawable & rhs) noexcept:
+    shader_program(rhs.shader_program),
+    geometry(move(rhs.geometry)),
+    colors(move(rhs.colors)),
+    ibo(move(rhs.ibo)),
+    size(rhs.size)
+{
+    configure_vao();
+}
+
+StaticDrawable & StaticDrawable::operator = (const StaticDrawable & rhs) noexcept {
+    shader_program = rhs.shader_program;
+    geometry = rhs.geometry;
+    colors = rhs.colors;
+    ibo = rhs.ibo;
+    size = rhs.size;
+
+    configure_vao();
+
+    return *this;
+}
+
 StaticDrawable::StaticDrawable(StaticDrawable && rhs) noexcept:
     shader_program(rhs.shader_program),
     geometry(move(rhs.geometry)),
@@ -25,6 +47,18 @@ StaticDrawable::StaticDrawable(StaticDrawable && rhs) noexcept:
     size(rhs.size)
 {
     configure_vao();
+}
+
+StaticDrawable & StaticDrawable::operator = (StaticDrawable && rhs) noexcept {
+    shader_program = move(rhs.shader_program);
+    geometry = move(rhs.geometry);
+    colors = move(rhs.colors);
+    ibo = move(rhs.ibo);
+    size = rhs.size;
+
+    configure_vao();
+
+    return *this;
 }
 
 void StaticDrawable::draw() const {

@@ -7,13 +7,13 @@ template<typename Listener, typename Ptr = Listener *, typename Collection = std
 class ListenerList {
 public:
     template<typename Fun>
-    inline void call(Fun && f) const {
+    inline void call(Fun f) const {
         for (auto && i : listener)
             (i->*f)();
     }
 
     template<typename Fun, typename... Values>
-    inline void call(Fun && f, Values && ... values) const {
+    inline void call(Fun f, Values && ... values) const {
         for (auto && i : listener)
             (i->*f)(std::forward<Values>(values)...);
     }

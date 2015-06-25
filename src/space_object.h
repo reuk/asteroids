@@ -21,11 +21,9 @@ public:
     void draw() const override;
     void update() override;
 
-    Program & shader_program;
-
     Mover<glm::vec2> position;
     Mover<float> angle;
 
-    const float size;
+    float size;
 };
 

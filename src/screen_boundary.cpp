@@ -21,8 +21,7 @@ ScreenBoundary::ScreenBoundary(Program & shader_program):
                       0, 1, 1,
                       0, 1, 1,
                       0, 1, 1},
-            vector<GLushort>{0, 1, 2, 3}),
-    shader_program(shader_program)
+            vector<GLushort>{0, 1, 2, 3})
 {
 
 }

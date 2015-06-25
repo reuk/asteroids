@@ -17,7 +17,6 @@ SpaceObject::SpaceObject(
         const Mover<vec2> & position,
         const Mover<float> & angle):
     StaticDrawable(shader_program, g, c, i),
-    shader_program(shader_program),
     position(position),
     angle(angle),
     size(size)

@@ -19,17 +19,17 @@ public:
             const std::vector<GLfloat> & colors,
             const std::vector<GLushort> & indices);
 
-    StaticDrawable(const StaticDrawable & rhs) = delete;
-    StaticDrawable & operator = (const StaticDrawable & rhs) = delete;
+    StaticDrawable(const StaticDrawable & rhs) noexcept;
+    StaticDrawable & operator = (const StaticDrawable & rhs) noexcept;
     StaticDrawable(StaticDrawable && rhs) noexcept;
-    StaticDrawable & operator = (StaticDrawable && rhs) = delete;
+    StaticDrawable & operator = (StaticDrawable && rhs) noexcept;
 
     void draw() const override;
 
+    Program & shader_program;
+
 private:
     void configure_vao() const;
-
-    Program & shader_program;
 
     VAO vao;
     VBO geometry;

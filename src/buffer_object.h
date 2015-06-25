@@ -20,8 +20,45 @@ public:
         glDeleteBuffers(1, &index);
     }
 
-    BufferObject(const BufferObject & rhs) = delete;
-    BufferObject & operator = (const BufferObject & rhs) = delete;
+    BufferObject(const BufferObject & rhs) noexcept:
+        index(0)
+    {
+        glGenBuffers(1, &index);
+
+        auto size = 0;
+
+        glBindBuffer(GL_COPY_READ_BUFFER, rhs.index);
+        glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size);
+
+        glBindBuffer(GL_COPY_WRITE_BUFFER, index);
+        glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, mode);
+
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+
+        glBindBuffer(GL_COPY_READ_BUFFER, 0);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+    }
+
+    BufferObject & operator = (const BufferObject & rhs) noexcept {
+        index = 0;
+
+        glGenBuffers(1, &index);
+
+        auto size = 0;
+
+        glBindBuffer(GL_COPY_READ_BUFFER, rhs.index);
+        glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size);
+
+        glBindBuffer(GL_COPY_WRITE_BUFFER, index);
+        glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, mode);
+
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+
+        glBindBuffer(GL_COPY_READ_BUFFER, 0);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+
+        return *this;
+    }
 
     BufferObject(BufferObject && rhs) noexcept:
         index(0)
@@ -42,7 +79,26 @@ public:
         glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
     }
 
-    BufferObject & operator = (BufferObject && rhs) = delete;
+    BufferObject & operator = (BufferObject && rhs) noexcept {
+        index = 0;
+
+        glGenBuffers(1, &index);
+
+        auto size = 0;
+
+        glBindBuffer(GL_COPY_READ_BUFFER, rhs.index);
+        glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size);
+
+        glBindBuffer(GL_COPY_WRITE_BUFFER, index);
+        glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, mode);
+
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+
+        glBindBuffer(GL_COPY_READ_BUFFER, 0);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+
+        return *this;
+    }
 
     void bind() const {
         glBindBuffer(type, index);

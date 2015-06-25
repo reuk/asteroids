@@ -22,6 +22,8 @@ public:
     void add_listener(Listener * listener);
     void remove_listener(Listener * listener);
 private:
+    glm::vec2 forward_vector() const;
+
     glm::vec2 forward() const;
     glm::vec2 backward() const;
     float left() const;

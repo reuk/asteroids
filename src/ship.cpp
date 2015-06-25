@@ -14,14 +14,18 @@ Ship::Ship(Program & shader_program):
     SpaceObject(
             shader_program,
             vector<GLfloat>{
-                     0,  1,  0,
-                     1, -1,  0,
-                    -1, -1,  0},
+                     0.0,  1.0,  0,
+                     1.0, -1.0,  0,
+                     0.5, -0.5,  0,
+                    -0.5, -0.5,  0,
+                    -1.0, -1.0,  0},
             vector<GLfloat>{
                      0,  1,  1,
                      0,  1,  1,
+                     1,  0,  0,
+                     1,  0,  0,
                      0,  1,  1},
-            vector<GLushort>{0, 1, 2},
+            vector<GLushort>{0, 1, 2, 3, 4},
             0.1),
     engine({random_device()()}),
     angle_distribution(0, M_PI * 2),
@@ -30,14 +34,18 @@ Ship::Ship(Program & shader_program):
 
 }
 
-vec2 Ship::forward()   const { return rotate(vec2(0, 1), angle.get_current()) * 0.01f; }
+glm::vec2 Ship::forward_vector() const {
+    return rotate(vec2(0, 1), angle.get_current());
+}
+
+vec2 Ship::forward()   const { return forward_vector() * 0.01f; }
 vec2 Ship::backward()  const { return -forward(); }
 float Ship::left()     const { return 0.02f; }
 float Ship::right()    const { return -left(); }
 
 void Ship::fire() {
-    auto pos = position.get_current();
-    auto vel = position.get_delta() + forward() * 2.0f;
+    auto pos = position.get_current() + forward_vector() * 0.1f;
+    auto vel = position.get_delta() + forward_vector() * 0.02f;
 
     auto ang = angle_distribution(engine);
     auto del = delta_distribution(engine);

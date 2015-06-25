@@ -21,6 +21,7 @@
 #include <list>
 #include <string>
 #include <map>
+#include <unordered_set>
 
 using namespace std;
 using namespace glm;
@@ -118,6 +119,16 @@ public:
                         shader_program,
                         Mover<vec2>(pos, vel),
                         Mover<float>(ang, del))));
+
+    }
+
+    void split_all_asteroids() {
+        vector<Asteroid> new_asteroids;
+        for (auto && i : asteroids) {
+            auto fragments = i.get_fragments();
+            new_asteroids.insert(new_asteroids.end(), fragments.begin(), fragments.end());
+        }
+        asteroids = new_asteroids;
     }
 
     void key(int key, int scancode, int action, int mods) override {
@@ -126,6 +137,7 @@ public:
 
         key_dispatch<decltype(&Asteroids::add_asteroid)>(this, {
             {GLFW_KEY_N, &Asteroids::add_asteroid},
+            {GLFW_KEY_M, &Asteroids::split_all_asteroids},
         }, key);
     }
 
