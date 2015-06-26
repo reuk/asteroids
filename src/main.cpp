@@ -82,7 +82,7 @@ public:
 
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        screen_boundary.draw();
+        //screen_boundary.draw();
         ship.draw();
         for (const auto & i : bullets)
             i.draw();
