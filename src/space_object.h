@@ -21,6 +21,8 @@ public:
     void draw() const override;
     void update() override;
 
+    bool is_hit(const SpaceObject & obj) const;
+
     Mover<glm::vec2> position;
     Mover<float> angle;
 

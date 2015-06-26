@@ -64,11 +64,24 @@ public:
         }
         frame_count++;
 
+        //  update each entity
         ship.update();
         for (auto && i : bullets)
             i.update();
         for (auto && i : asteroids)
             i.update();
+
+        //  check for collisions
+        for (auto && i : asteroids) {
+            if (ship.is_hit(i)) {
+                //  ship dies!
+            }
+        }
+
+        for (auto i = asteroids.begin(); i != asteroids.end();) {
+            for (auto j = bullets.begin(); j != bullets.end();) {
+            }
+        }
     }
 
     void draw() const override {

@@ -2,6 +2,7 @@
 
 #include "space_object.h"
 #include "listener_list.h"
+#include "bullet.h"
 
 class Asteroid: public SpaceObject {
 public:
@@ -14,6 +15,4 @@ public:
     std::vector<Asteroid> get_fragments() const;
 private:
     static const int POINTS = 10;
-
-    float size;
 };

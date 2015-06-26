@@ -9,4 +9,3 @@ public:
             const Mover<glm::vec2> & position = Mover<glm::vec2>(),
             const Mover<float> & angle = Mover<float>());
 };
-

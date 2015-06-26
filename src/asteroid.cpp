@@ -63,14 +63,13 @@ Asteroid::Asteroid(
             indices(POINTS),
             size,
             position,
-            angle),
-    size(size)
+            angle)
 {
 
 }
 
 vector<Asteroid> Asteroid::get_fragments() const {
-    auto fragments = 4;
+    auto fragments = 3;
 
     vector<Asteroid> ret;
 

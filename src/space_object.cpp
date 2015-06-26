@@ -41,3 +41,7 @@ void SpaceObject::update() {
     position.set_current(mod(position.get_current() + 1.0f, 2.0f) - 1.0f);
     angle.set_current(fmod(angle.get_current(), static_cast<float>(M_PI * 2)));
 }
+
+bool SpaceObject::is_hit(const SpaceObject & obj) const {
+    return distance(position.get_current(), obj.position.get_current()) < (size + obj.size);
+}
