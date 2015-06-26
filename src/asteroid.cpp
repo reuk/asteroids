@@ -84,7 +84,7 @@ vector<Asteroid> Asteroid::get_fragments() const {
         uniform_real_distribution<float> speed_dist(0.0, 0.01);
 
         auto direction = dir_dist(engine);
-        auto vel = vec2(sin(direction), cos(direction)) * speed_dist(engine);
+        auto vel = position.get_delta() + vec2(sin(direction), cos(direction)) * speed_dist(engine);
 
         auto ang = dir_dist(engine);
         auto del = speed_dist(engine);

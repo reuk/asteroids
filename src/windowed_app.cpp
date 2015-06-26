@@ -12,6 +12,7 @@ WindowedApp::WindowedApp() {
     window_hint(GLFW_OPENGL_FORWARD_COMPAT, true);
     window_hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     window_hint(GLFW_SAMPLES, 4);
+    window_hint(GLFW_RESIZABLE, false);
 
     window = Window(size.x, size.y, "", nullptr, nullptr);
 
