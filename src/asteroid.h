@@ -7,7 +7,7 @@
 class Asteroid: public SpaceObject {
 public:
     Asteroid(
-            Program & p,
+            GenericShader & p,
             const Mover<glm::vec2> & position = Mover<glm::vec2>(),
             const Mover<float> & angle = Mover<float>(),
             float size = 0.1);

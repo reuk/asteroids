@@ -7,7 +7,7 @@
 #include "ship.h"
 #include "bullet.h"
 #include "screen_boundary.h"
-#include "shader_program.h"
+#include "generic_shader.h"
 #include "key_callback.h"
 
 #define GLM_FORCE_RADIANS
@@ -29,13 +29,13 @@ using namespace glm;
 class Asteroids: public WindowedApp, public WindowedApp::Listener, public Ship::Listener {
 public:
     Asteroids():
-        shader_program(vertex_shader, fragment_shader),
 #ifdef DEBUG
         previous_seconds(glfwGetTime()),
         frame_count(0),
 #endif
         screen_boundary(shader_program),
-        ship(shader_program)
+        ship(shader_program),
+        lives(max_lives)
     {
         get_window().set_title(name.c_str());
 
@@ -115,10 +115,16 @@ public:
         //  check for collisions
         for (auto && i : asteroids) {
             if (ship.is_hit(i)) {
-                //  ship dies!
+                lives -= 1;
+                if (lives == 0) {
+                    //  TODO game over!
+                }
+                ship = Ship(shader_program);
+                ship.add_listener(this);
             }
         }
 
+        //  TODO this is slow and terrible
         vector<bool> asteroids_to_delete(asteroids.size(), false);
         vector<bool> bullets_to_delete(bullets.size(), false);
 
@@ -143,10 +149,10 @@ public:
         shader_program.use();
 
         auto view_matrix = lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
-        glUniformMatrix4fv(shader_program.get_uniform_location("v_view"), 1, GL_FALSE, value_ptr(view_matrix));
+        shader_program.set_view_matrix(view_matrix);
 
         auto projection_matrix = perspective(45.0f, aspect, 0.1f, 10.0f);
-        glUniformMatrix4fv(shader_program.get_uniform_location("v_projection"), 1, GL_FALSE, value_ptr(projection_matrix));
+        shader_program.set_projection_matrix(projection_matrix);
 
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -216,48 +222,25 @@ public:
 private:
     static const string name;
 
-    static const std::string vertex_shader;
-    static const std::string fragment_shader;
-
-    ShaderProgram shader_program;
+    GenericShader shader_program;
 
 #ifdef DEBUG
     double previous_seconds;
     unsigned int frame_count;
 #endif
-
     float aspect;
 
     ScreenBoundary screen_boundary;
     Ship ship;
     vector<Bullet> bullets;
     vector<Asteroid> asteroids;
+
+    static const int max_lives;
+    int lives;
 };
 
 const string Asteroids::name = "asteroids";
-
-const string Asteroids::vertex_shader(R"(
-#version 330
-in vec3 v_position;
-in vec3 v_color;
-out vec3 f_color;
-uniform mat4 v_model;
-uniform mat4 v_view;
-uniform mat4 v_projection;
-void main() {
-    gl_Position = v_projection * v_view * v_model * vec4(v_position, 1.0);
-    f_color = v_color;
-}
-)");
-
-const string Asteroids::fragment_shader(R"(
-#version 330
-in vec3 f_color;
-out vec4 frag_color;
-void main() {
-    frag_color = vec4(f_color, 1.0);
-}
-)");
+const int Asteroids::max_lives = 5;
 
 int main() {
     Logger::restart();

@@ -2,7 +2,7 @@
 
 #include "vao.h"
 #include "buffer_object.h"
-#include "shader_program.h"
+#include "generic_shader.h"
 
 #include <vector>
 
@@ -14,7 +14,7 @@ public:
 class StaticDrawable: public Drawable {
 public:
     StaticDrawable(
-            Program & shader_program,
+            GenericShader & shader_program,
             const std::vector<GLfloat> & geometry,
             const std::vector<GLfloat> & colors,
             const std::vector<GLushort> & indices);
@@ -26,7 +26,7 @@ public:
 
     void draw() const override;
 
-    Program & shader_program;
+    GenericShader & shader_program;
 
 private:
     void configure_vao() const;

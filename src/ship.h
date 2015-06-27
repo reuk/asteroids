@@ -13,7 +13,7 @@ public:
         virtual void ship_gun_fired(Bullet && bullet) = 0;
     };
 
-    Ship(Program & p);
+    Ship(GenericShader & p);
 
     void resize(const glm::vec2 & v) override;
     void error(const std::string & s) override;
@@ -21,6 +21,10 @@ public:
 
     void add_listener(Listener * listener);
     void remove_listener(Listener * listener);
+
+    void set_life(float life);
+    float get_life() const;
+
 private:
     glm::vec2 forward_vector() const;
 
@@ -29,6 +33,8 @@ private:
     float left() const;
     float right() const;
     void fire();
+
+    float life;
 
     ListenerList<Listener> listener_list;
 

@@ -3,7 +3,7 @@
 using namespace std;
 
 StaticDrawable::StaticDrawable(
-        Program & shader_program,
+        GenericShader & shader_program,
         const vector<GLfloat> & g,
         const vector<GLfloat> & c,
         const vector<GLushort> & i):

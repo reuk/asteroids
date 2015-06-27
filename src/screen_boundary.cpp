@@ -9,7 +9,7 @@
 using namespace std;
 using namespace glm;
 
-ScreenBoundary::ScreenBoundary(Program & shader_program):
+ScreenBoundary::ScreenBoundary(GenericShader & shader_program):
     StaticDrawable(
             shader_program,
             vector<GLfloat>{
@@ -28,6 +28,6 @@ ScreenBoundary::ScreenBoundary(Program & shader_program):
 }
 
 void ScreenBoundary::draw() const {
-    glUniformMatrix4fv(shader_program.get_uniform_location("v_model"), 1, GL_FALSE, value_ptr(mat4(1)));
+    shader_program.set_model_matrix(mat4(1));
     StaticDrawable::draw();
 }

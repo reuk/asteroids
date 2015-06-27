@@ -10,7 +10,7 @@
 using namespace std;
 using namespace glm;
 
-Ship::Ship(Program & shader_program):
+Ship::Ship(GenericShader & shader_program):
     SpaceObject(
             shader_program,
             vector<GLfloat>{
@@ -76,4 +76,7 @@ void Ship::key(int key, int scancode, int action, int mods) {
         {GLFW_KEY_SPACE, &Ship::fire},
     }, key);
 }
+
+void Ship::set_life(float l) {life = l;}
+float Ship::get_life() const {return life;}
 

@@ -52,7 +52,7 @@ vector<GLfloat> format(const vector<vec3> & points) {
 }
 
 Asteroid::Asteroid(
-        Program & shader_program,
+        GenericShader & shader_program,
         const Mover<vec2> & position,
         const Mover<float> & angle,
         float size):

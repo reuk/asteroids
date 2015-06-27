@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mover.h"
-#include "program.h"
+#include "generic_shader.h"
 #include "updatable.h"
 #include "drawable.h"
 
@@ -10,7 +10,7 @@
 class SpaceObject: public Updatable, public StaticDrawable {
 public:
     SpaceObject(
-            Program & shader_program,
+            GenericShader & shader_program,
             const std::vector<GLfloat> &,
             const std::vector<GLfloat> &,
             const std::vector<GLushort> &,

@@ -3,13 +3,19 @@ Asteroids
 
 A little version of Asteroids in C++14 using just GLFW, GLEW, and GLM.
 
-Todo
+Done
 ====
 
 * Hit detection
 * Hook up asteroids so that they split when hit by a bullet
+
+Todo
+====
+
 * Lives/health for the spaceship
-* Twaeak spaceship physics/controls
+* Precompute asteroid shapes and then reuse them
+* Have ship + asteroid classes reference 'static' drawable classes
+* Tweak spaceship physics/controls
 * Score counter
 * Title screen and leaderboard
 

@@ -4,7 +4,7 @@ using namespace std;
 using namespace glm;
 
 Bullet::Bullet(
-        Program & shader_program,
+        GenericShader & shader_program,
         const Mover<vec2> & position,
         const Mover<float> & angle):
     SpaceObject(
