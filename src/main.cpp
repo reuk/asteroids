@@ -30,11 +30,15 @@ class Asteroids: public WindowedApp, public WindowedApp::Listener, public Ship::
 public:
     Asteroids():
         shader_program(vertex_shader, fragment_shader),
+#ifdef DEBUG
         previous_seconds(glfwGetTime()),
         frame_count(0),
+#endif
         screen_boundary(shader_program),
         ship(shader_program)
     {
+        get_window().set_title(name.c_str());
+
         Logger::log("GLFW version: ", glfwGetVersionString());
         Logger::log("Renderer: ", glGetString(GL_RENDERER));
         Logger::log("OpenGL version: ", glGetString(GL_VERSION));
@@ -49,7 +53,43 @@ public:
         ship.add_listener(this);
     }
 
+    template<typename T>
+    void clear_marked(vector<T> & t, vector<bool> & marked) {
+        auto i = t.begin();
+        auto id = marked.begin();
+        for (; i != t.end();) {
+            if (*id) {
+                i = t.erase(i);
+                id = marked.erase(id);
+            } else {
+                ++i;
+                ++id;
+            }
+        }
+    }
+
+    template<typename T>
+    void split_marked(vector<T> & t, vector<bool> & marked) {
+        vector<T> to_insert;
+
+        auto i = t.begin();
+        auto id = marked.begin();
+        for (; i != t.end();) {
+            if (*id) {
+                auto fragments = i->get_fragments();
+                to_insert.insert(to_insert.end(), fragments.begin(), fragments.end());
+                i = t.erase(i);
+                id = marked.erase(id);
+            } else {
+                ++i;
+                ++id;
+            }
+        }
+        t.insert(t.end(), to_insert.begin(), to_insert.end());
+    }
+
     void update() override {
+#ifdef DEBUG
         auto current_seconds = glfwGetTime();
         auto elapsed_seconds = current_seconds - previous_seconds;
         if (elapsed_seconds > 0.1) {
@@ -63,6 +103,7 @@ public:
             frame_count = 0;
         }
         frame_count++;
+#endif
 
         //  update each entity
         ship.update();
@@ -78,10 +119,24 @@ public:
             }
         }
 
-        for (auto i = asteroids.begin(); i != asteroids.end();) {
-            for (auto j = bullets.begin(); j != bullets.end();) {
+        vector<bool> asteroids_to_delete(asteroids.size(), false);
+        vector<bool> bullets_to_delete(bullets.size(), false);
+
+        auto i = asteroids.begin();
+        auto id = asteroids_to_delete.begin();
+        for (; i != asteroids.end(); ++i, ++id) {
+            auto j = bullets.begin();
+            auto jd = bullets_to_delete.begin();
+            for (; j != bullets.end(); ++j, ++jd) {
+                if (i->is_hit(*j)) {
+                    *id = true;
+                    *jd = true;
+                }
             }
         }
+
+        split_marked(asteroids, asteroids_to_delete);
+        clear_marked(bullets, bullets_to_delete);
     }
 
     void draw() const override {
@@ -166,8 +221,10 @@ private:
 
     ShaderProgram shader_program;
 
+#ifdef DEBUG
     double previous_seconds;
     unsigned int frame_count;
+#endif
 
     float aspect;
 
