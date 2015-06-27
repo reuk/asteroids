@@ -37,6 +37,5 @@ public:
 private:
     static glm::vec2 size;
     static ListenerList<Listener> listener_list;
-
     Window window;
 };

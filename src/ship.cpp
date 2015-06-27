@@ -22,8 +22,8 @@ Ship::Ship(Program & shader_program):
             vector<GLfloat>{
                      0,  1,  1,
                      0,  1,  1,
-                     1,  0,  0,
-                     1,  0,  0,
+                     0,  1,  1,
+                     0,  1,  1,
                      0,  1,  1},
             vector<GLushort>{0, 1, 2, 3, 4},
             0.1),

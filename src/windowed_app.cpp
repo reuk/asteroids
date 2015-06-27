@@ -29,7 +29,10 @@ WindowedApp::WindowedApp() {
 }
 
 void WindowedApp::run() {
-    listener_list.call(&Listener::resize, size);
+    auto w = 0;
+    auto h = 0;
+    window.get_framebuffer_size(w, h);
+    listener_list.call(&Listener::resize, vec2(w, h));
 
     while (! window.get_should_close()) {
         update();
