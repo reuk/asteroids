@@ -2,10 +2,8 @@
 
 #include <GLFW/glfw3.h>
 
-
-
 class GLFWApp {
-public:
+   public:
     GLFWApp();
     virtual ~GLFWApp();
 

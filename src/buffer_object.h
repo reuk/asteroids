@@ -7,22 +7,14 @@
 
 #include "logger.h"
 
-template<GLuint type, GLuint mode>
+template <GLuint type, GLuint mode>
 class BufferObject {
-public:
-    BufferObject():
-        index(0)
-    {
-        glGenBuffers(1, &index);
-    }
+   public:
+    BufferObject() : index(0) { glGenBuffers(1, &index); }
 
-    virtual ~BufferObject() {
-        glDeleteBuffers(1, &index);
-    }
+    virtual ~BufferObject() { glDeleteBuffers(1, &index); }
 
-    BufferObject(const BufferObject & rhs) noexcept:
-        index(0)
-    {
+    BufferObject(const BufferObject& rhs) noexcept : index(0) {
         glGenBuffers(1, &index);
 
         auto size = 0;
@@ -33,13 +25,14 @@ public:
         glBindBuffer(GL_COPY_WRITE_BUFFER, index);
         glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, mode);
 
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0,
+                            size);
 
         glBindBuffer(GL_COPY_READ_BUFFER, 0);
         glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
     }
 
-    BufferObject & operator = (const BufferObject & rhs) noexcept {
+    BufferObject& operator=(const BufferObject& rhs) noexcept {
         index = 0;
 
         glGenBuffers(1, &index);
@@ -52,7 +45,8 @@ public:
         glBindBuffer(GL_COPY_WRITE_BUFFER, index);
         glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, mode);
 
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0,
+                            size);
 
         glBindBuffer(GL_COPY_READ_BUFFER, 0);
         glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
@@ -60,9 +54,7 @@ public:
         return *this;
     }
 
-    BufferObject(BufferObject && rhs) noexcept:
-        index(0)
-    {
+    BufferObject(BufferObject&& rhs) noexcept : index(0) {
         glGenBuffers(1, &index);
 
         auto size = 0;
@@ -73,13 +65,14 @@ public:
         glBindBuffer(GL_COPY_WRITE_BUFFER, index);
         glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, mode);
 
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0,
+                            size);
 
         glBindBuffer(GL_COPY_READ_BUFFER, 0);
         glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
     }
 
-    BufferObject & operator = (BufferObject && rhs) noexcept {
+    BufferObject& operator=(BufferObject&& rhs) noexcept {
         index = 0;
 
         glGenBuffers(1, &index);
@@ -92,7 +85,8 @@ public:
         glBindBuffer(GL_COPY_WRITE_BUFFER, index);
         glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, mode);
 
-        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0,
+                            size);
 
         glBindBuffer(GL_COPY_READ_BUFFER, 0);
         glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
@@ -100,25 +94,19 @@ public:
         return *this;
     }
 
-    void bind() const {
-        glBindBuffer(type, index);
-    }
+    void bind() const { glBindBuffer(type, index); }
 
-    static void unbind() {
-        glBindBuffer(type, 0);
-    }
+    static void unbind() { glBindBuffer(type, 0); }
 
-    template<typename T>
-    void data(const std::vector<T> & t) const {
+    template <typename T>
+    void data(const std::vector<T>& t) const {
         bind();
         glBufferData(type, t.size() * sizeof(T), t.data(), mode);
     }
 
-    GLuint get_index() const {
-        return index;
-    }
+    GLuint get_index() const { return index; }
 
-private:
+   private:
     GLuint index;
 };
 

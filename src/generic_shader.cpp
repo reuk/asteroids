@@ -7,25 +7,22 @@
 
 using namespace std;
 
-GenericShader::GenericShader():
-    ShaderProgram(vertex_shader, fragment_shader)
-{
+GenericShader::GenericShader()
+    : ShaderProgram(vertex_shader, fragment_shader) {}
 
-}
-
-void GenericShader::set_matrix(const string & s, const glm::mat4 & mat) const {
+void GenericShader::set_matrix(const string& s, const glm::mat4& mat) const {
     glUniformMatrix4fv(get_uniform_location(s), 1, GL_FALSE, value_ptr(mat));
 }
 
-void GenericShader::set_model_matrix(const glm::mat4 & mat) const {
+void GenericShader::set_model_matrix(const glm::mat4& mat) const {
     set_matrix("v_model", mat);
 }
 
-void GenericShader::set_view_matrix(const glm::mat4 & mat) const {
+void GenericShader::set_view_matrix(const glm::mat4& mat) const {
     set_matrix("v_view", mat);
 }
 
-void GenericShader::set_projection_matrix(const glm::mat4 & mat) const {
+void GenericShader::set_projection_matrix(const glm::mat4& mat) const {
     set_matrix("v_projection", mat);
 }
 
@@ -51,4 +48,3 @@ void main() {
     frag_color = vec4(f_color, 1.0);
 }
 )");
-

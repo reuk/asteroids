@@ -8,26 +8,20 @@
 using namespace std;
 using namespace glm;
 
-SpaceObject::SpaceObject(
-        GenericShader & shader_program,
-        const vector<GLfloat> & g,
-        const vector<GLfloat> & c,
-        const vector<GLushort> & i,
-        float size,
-        const Mover<vec2> & position,
-        const Mover<float> & angle):
-    StaticDrawable(shader_program, g, c, i),
-    position(position),
-    angle(angle),
-    size(size)
-{
-
-}
+SpaceObject::SpaceObject(GenericShader& shader_program,
+                         const vector<GLfloat>& g, const vector<GLfloat>& c,
+                         const vector<GLushort>& i, float size,
+                         const Mover<vec2>& position, const Mover<float>& angle)
+    : StaticDrawable(shader_program, g, c, i),
+      position(position),
+      angle(angle),
+      size(size) {}
 
 void SpaceObject::draw() const {
     auto scale_matrix = scale(mat4(1), vec3(size));
     auto angle_matrix = rotate(mat4(1), angle.get_current(), vec3(0, 0, 1));
-    auto position_matrix = translate(mat4(1), vec3(position.get_current(), 0.0f));
+    auto position_matrix =
+        translate(mat4(1), vec3(position.get_current(), 0.0f));
     auto model_matrix = position_matrix * angle_matrix * scale_matrix;
 
     shader_program.set_model_matrix(model_matrix);
@@ -42,6 +36,7 @@ void SpaceObject::update() {
     angle.set_current(fmod(angle.get_current(), static_cast<float>(M_PI * 2)));
 }
 
-bool SpaceObject::is_hit(const SpaceObject & obj) const {
-    return distance(position.get_current(), obj.position.get_current()) < (size + obj.size);
+bool SpaceObject::is_hit(const SpaceObject& obj) const {
+    return distance(position.get_current(), obj.position.get_current()) <
+           (size + obj.size);
 }

@@ -20,27 +20,19 @@ vector<vec3> noise_circle(int points) {
     auto counter = indices(points);
 
     vector<float> angles(points);
-    transform(
-            begin(counter),
-            end(counter),
-            begin(angles),
-            [points](auto i) {
-                return (i++ * 2 * M_PI) / points;
-            });
+    transform(begin(counter), end(counter), begin(angles),
+              [points](auto i) { return (i++ * 2 * M_PI) / points; });
 
     vector<vec3> ret(points);
-    transform(
-            begin(angles),
-            end(angles),
-            begin(ret),
-            [&engine, &noise_dist](auto i) {
-                auto radius = noise_dist(engine);
-                return vec3(sin(i), cos(i), 0) * radius;
-            });
+    transform(begin(angles), end(angles), begin(ret),
+              [&engine, &noise_dist](auto i) {
+                  auto radius = noise_dist(engine);
+                  return vec3(sin(i), cos(i), 0) * radius;
+              });
     return ret;
 }
 
-vector<GLfloat> format(const vector<vec3> & points) {
+vector<GLfloat> format(const vector<vec3>& points) {
     vector<GLfloat> ret(points.size() * 3);
     for (auto i = 0; i != points.size(); ++i) {
         auto ret_index = i * 3;
@@ -51,22 +43,11 @@ vector<GLfloat> format(const vector<vec3> & points) {
     return ret;
 }
 
-Asteroid::Asteroid(
-        GenericShader & shader_program,
-        const Mover<vec2> & position,
-        const Mover<float> & angle,
-        float size):
-    SpaceObject(
-            shader_program,
-            format(noise_circle(POINTS)),
-            format(vector<vec3>(POINTS, vec3(0, 1, 1))),
-            indices(POINTS),
-            size,
-            position,
-            angle)
-{
-
-}
+Asteroid::Asteroid(GenericShader& shader_program, const Mover<vec2>& position,
+                   const Mover<float>& angle, float size)
+    : SpaceObject(shader_program, format(noise_circle(POINTS)),
+                  format(vector<vec3>(POINTS, vec3(0, 1, 1))), indices(POINTS),
+                  size, position, angle) {}
 
 vector<Asteroid> Asteroid::get_fragments() const {
     auto fragments = 3;
@@ -74,8 +55,7 @@ vector<Asteroid> Asteroid::get_fragments() const {
     vector<Asteroid> ret;
 
     auto next_size = size * 0.5;
-    if (next_size < 0.02)
-        return ret;
+    if (next_size < 0.02) return ret;
 
     for (auto i = 0; i != fragments; ++i) {
         default_random_engine engine{random_device()()};
@@ -84,16 +64,15 @@ vector<Asteroid> Asteroid::get_fragments() const {
         uniform_real_distribution<float> speed_dist(0.0, 0.01);
 
         auto direction = dir_dist(engine);
-        auto vel = position.get_delta() + vec2(sin(direction), cos(direction)) * speed_dist(engine);
+        auto vel = position.get_delta() +
+                   vec2(sin(direction), cos(direction)) * speed_dist(engine);
 
         auto ang = dir_dist(engine);
         auto del = speed_dist(engine);
 
-        ret.emplace_back(move(Asteroid(
-                        shader_program,
-                        Mover<vec2>(position.get_current(), vel),
-                        Mover<float>(ang, del),
-                        next_size)));
+        ret.emplace_back(move(Asteroid(shader_program,
+                                       Mover<vec2>(position.get_current(), vel),
+                                       Mover<float>(ang, del), next_size)));
     }
 
     return ret;

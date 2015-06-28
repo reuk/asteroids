@@ -2,14 +2,11 @@
 
 using namespace std;
 
-StaticDrawable::StaticDrawable(
-        GenericShader & shader_program,
-        const vector<GLfloat> & g,
-        const vector<GLfloat> & c,
-        const vector<GLushort> & i):
-    shader_program(shader_program),
-    size(i.size())
-{
+StaticDrawable::StaticDrawable(GenericShader& shader_program,
+                               const vector<GLfloat>& g,
+                               const vector<GLfloat>& c,
+                               const vector<GLushort>& i)
+    : shader_program(shader_program), size(i.size()) {
     geometry.data(g);
     colors.data(c);
     ibo.data(i);
@@ -17,17 +14,16 @@ StaticDrawable::StaticDrawable(
     configure_vao();
 }
 
-StaticDrawable::StaticDrawable(const StaticDrawable & rhs) noexcept:
-    shader_program(rhs.shader_program),
-    geometry(move(rhs.geometry)),
-    colors(move(rhs.colors)),
-    ibo(move(rhs.ibo)),
-    size(rhs.size)
-{
+StaticDrawable::StaticDrawable(const StaticDrawable& rhs) noexcept
+    : shader_program(rhs.shader_program),
+      geometry(move(rhs.geometry)),
+      colors(move(rhs.colors)),
+      ibo(move(rhs.ibo)),
+      size(rhs.size) {
     configure_vao();
 }
 
-StaticDrawable & StaticDrawable::operator = (const StaticDrawable & rhs) noexcept {
+StaticDrawable& StaticDrawable::operator=(const StaticDrawable& rhs) noexcept {
     shader_program = rhs.shader_program;
     geometry = rhs.geometry;
     colors = rhs.colors;
@@ -39,17 +35,16 @@ StaticDrawable & StaticDrawable::operator = (const StaticDrawable & rhs) noexcep
     return *this;
 }
 
-StaticDrawable::StaticDrawable(StaticDrawable && rhs) noexcept:
-    shader_program(rhs.shader_program),
-    geometry(move(rhs.geometry)),
-    colors(move(rhs.colors)),
-    ibo(move(rhs.ibo)),
-    size(rhs.size)
-{
+StaticDrawable::StaticDrawable(StaticDrawable&& rhs) noexcept
+    : shader_program(rhs.shader_program),
+      geometry(move(rhs.geometry)),
+      colors(move(rhs.colors)),
+      ibo(move(rhs.ibo)),
+      size(rhs.size) {
     configure_vao();
 }
 
-StaticDrawable & StaticDrawable::operator = (StaticDrawable && rhs) noexcept {
+StaticDrawable& StaticDrawable::operator=(StaticDrawable&& rhs) noexcept {
     shader_program = move(rhs.shader_program);
     geometry = move(rhs.geometry);
     colors = move(rhs.colors);

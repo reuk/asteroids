@@ -5,40 +5,33 @@
 #include <string>
 #include <stdexcept>
 
-template<GLuint type>
+template <GLuint type>
 class Shader {
-public:
-    Shader():
-        index(glCreateShader(type))
-    {
+   public:
+    Shader() : index(glCreateShader(type)) {
         if (index == 0) {
             throw std::runtime_error("failed to create shader");
         }
     }
 
-    virtual ~Shader() {
-        glDeleteShader(index);
-    }
+    virtual ~Shader() { glDeleteShader(index); }
 
-    Shader(const Shader & rhs) = delete;
-    void operator = (const Shader & rhs) = delete;
+    Shader(const Shader& rhs) = delete;
+    void operator=(const Shader& rhs) = delete;
 
-    Shader(Shader && rhs) noexcept = default;
-    Shader & operator = (Shader && rhs) noexcept = default;
+    Shader(Shader&& rhs) noexcept = default;
+    Shader& operator=(Shader&& rhs) noexcept = default;
 
-    void source(const std::string & src) const {
+    void source(const std::string& src) const {
         auto ptr = src.c_str();
         glShaderSource(index, 1, &ptr, nullptr);
     }
 
-    void compile() const {
-        glCompileShader(index);
-    }
+    void compile() const { glCompileShader(index); }
 
-    GLuint get_index() const {
-        return index;
-    }
-private:
+    GLuint get_index() const { return index; }
+
+   private:
     GLuint index;
 };
 

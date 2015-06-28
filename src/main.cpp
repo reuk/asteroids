@@ -26,17 +26,19 @@
 using namespace std;
 using namespace glm;
 
-class Asteroids: public WindowedApp, public WindowedApp::Listener, public Ship::Listener {
-public:
-    Asteroids():
+class Asteroids : public WindowedApp,
+                  public WindowedApp::Listener,
+                  public Ship::Listener {
+   public:
+    Asteroids()
+        :
 #ifdef DEBUG
-        previous_seconds(glfwGetTime()),
-        frame_count(0),
+          previous_seconds(glfwGetTime()),
+          frame_count(0),
 #endif
-        screen_boundary(shader_program),
-        ship(shader_program),
-        lives(max_lives)
-    {
+          screen_boundary(shader_program),
+          ship(shader_program),
+          lives(max_lives) {
         get_window().set_title(name.c_str());
 
         Logger::log("GLFW version: ", glfwGetVersionString());
@@ -53,8 +55,8 @@ public:
         ship.add_listener(this);
     }
 
-    template<typename T>
-    void clear_marked(vector<T> & t, vector<bool> & marked) {
+    template <typename T>
+    void clear_marked(vector<T>& t, vector<bool>& marked) {
         auto i = t.begin();
         auto id = marked.begin();
         for (; i != t.end();) {
@@ -68,8 +70,8 @@ public:
         }
     }
 
-    template<typename T>
-    void split_marked(vector<T> & t, vector<bool> & marked) {
+    template <typename T>
+    void split_marked(vector<T>& t, vector<bool>& marked) {
         vector<T> to_insert;
 
         auto i = t.begin();
@@ -77,7 +79,8 @@ public:
         for (; i != t.end();) {
             if (*id) {
                 auto fragments = i->get_fragments();
-                to_insert.insert(to_insert.end(), fragments.begin(), fragments.end());
+                to_insert.insert(to_insert.end(), fragments.begin(),
+                                 fragments.end());
                 i = t.erase(i);
                 id = marked.erase(id);
             } else {
@@ -107,13 +110,11 @@ public:
 
         //  update each entity
         ship.update();
-        for (auto && i : bullets)
-            i.update();
-        for (auto && i : asteroids)
-            i.update();
+        for (auto&& i : bullets) i.update();
+        for (auto&& i : asteroids) i.update();
 
         //  check for collisions
-        for (auto && i : asteroids) {
+        for (auto&& i : asteroids) {
             if (ship.is_hit(i)) {
                 lives -= 1;
                 if (lives == 0) {
@@ -148,7 +149,8 @@ public:
     void draw() const override {
         shader_program.use();
 
-        auto view_matrix = lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+        auto view_matrix =
+            lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
         shader_program.set_view_matrix(view_matrix);
 
         auto projection_matrix = perspective(45.0f, aspect, 0.1f, 10.0f);
@@ -156,23 +158,19 @@ public:
 
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //screen_boundary.draw();
+        // screen_boundary.draw();
         ship.draw();
-        for (const auto & i : bullets)
-            i.draw();
-        for (const auto & i : asteroids)
-            i.draw();
+        for (const auto& i : bullets) i.draw();
+        for (const auto& i : asteroids) i.draw();
         Program::unuse();
     }
 
-    void resize(const vec2 & v) override {
+    void resize(const vec2& v) override {
         glViewport(0, 0, v.x, v.y);
         aspect = v.x / v.y;
     }
 
-    void error(const std::string & s) override {
-        Logger::log_err("error: ", s);
-    }
+    void error(const std::string& s) override { Logger::log_err("error: ", s); }
 
     void add_asteroid() {
         default_random_engine engine{random_device()()};
@@ -190,36 +188,36 @@ public:
         auto del = speed_dist(engine);
 
         asteroids.emplace_back(move(Asteroid(
-                        shader_program,
-                        Mover<vec2>(pos, vel),
-                        Mover<float>(ang, del))));
-
+            shader_program, Mover<vec2>(pos, vel), Mover<float>(ang, del))));
     }
 
     void split_all_asteroids() {
         vector<Asteroid> new_asteroids;
-        for (auto && i : asteroids) {
+        for (auto&& i : asteroids) {
             auto fragments = i.get_fragments();
-            new_asteroids.insert(new_asteroids.end(), fragments.begin(), fragments.end());
+            new_asteroids.insert(new_asteroids.end(), fragments.begin(),
+                                 fragments.end());
         }
         asteroids = new_asteroids;
     }
 
     void key(int key, int scancode, int action, int mods) override {
-        if (! (action == GLFW_PRESS || action == GLFW_REPEAT))
-            return;
+        if (!(action == GLFW_PRESS || action == GLFW_REPEAT)) return;
 
-        key_dispatch<decltype(&Asteroids::add_asteroid)>(this, {
-            {GLFW_KEY_N, &Asteroids::add_asteroid},
-            {GLFW_KEY_M, &Asteroids::split_all_asteroids},
-        }, key);
+        key_dispatch<decltype(&Asteroids::add_asteroid)>(
+            this,
+            {
+                {GLFW_KEY_N, &Asteroids::add_asteroid},
+                {GLFW_KEY_M, &Asteroids::split_all_asteroids},
+            },
+            key);
     }
 
-    void ship_gun_fired(Bullet && bullet) override {
+    void ship_gun_fired(Bullet&& bullet) override {
         bullets.emplace_back(move(bullet));
     }
 
-private:
+   private:
     static const string name;
 
     GenericShader shader_program;
@@ -249,10 +247,10 @@ int main() {
     try {
         Asteroids asteroids;
         asteroids.run();
-    } catch (const runtime_error & re) {
+    } catch (const runtime_error& re) {
         Logger::log_err(re.what());
         return 1;
-    } catch (const bad_alloc & ba) {
+    } catch (const bad_alloc& ba) {
         Logger::log_err(ba.what());
         return 1;
     } catch (...) {

@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 class VAO {
-public:
+   public:
     VAO();
     virtual ~VAO();
 
@@ -13,6 +13,6 @@ public:
 
     GLuint get_index() const;
 
-private:
+   private:
     GLuint index;
 };

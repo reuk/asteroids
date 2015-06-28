@@ -1,7 +1,7 @@
 #pragma once
 
 class Updatable {
-public:
+   public:
     virtual ~Updatable() {}
 
     virtual void update() = 0;
