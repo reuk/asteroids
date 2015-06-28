@@ -13,7 +13,8 @@ Todo
 ====
 
 * Lives/health for the spaceship
-* Precompute asteroid shapes and then reuse them
+* Particle effects when an asteroid splits
+* Precompute asteroid and ship shapes and then reuse them
 * Have ship + asteroid classes reference 'static' drawable classes
 * Tweak spaceship physics/controls
 * Score counter
