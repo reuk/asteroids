@@ -8,11 +8,10 @@
 using namespace std;
 using namespace glm;
 
-SpaceObject::SpaceObject(GenericShader& shader_program,
-                         const vector<GLfloat>& g, const vector<GLfloat>& c,
-                         const vector<GLushort>& i, float size,
+SpaceObject::SpaceObject(StaticDrawable& graphic,
+                         float size,
                          const Mover<vec2>& position, const Mover<float>& angle)
-    : StaticDrawable(shader_program, g, c, i),
+    : graphic(graphic),
       position(position),
       angle(angle),
       size(size) {}
@@ -24,8 +23,8 @@ void SpaceObject::draw() const {
         translate(mat4(1), vec3(position.get_current(), 0.0f));
     auto model_matrix = position_matrix * angle_matrix * scale_matrix;
 
-    shader_program.set_model_matrix(model_matrix);
-    StaticDrawable::draw();
+    graphic.set_model_matrix(model_matrix);
+    graphic.draw();
 }
 
 void SpaceObject::update() {

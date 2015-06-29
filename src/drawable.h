@@ -4,6 +4,8 @@
 #include "buffer_object.h"
 #include "generic_shader.h"
 
+#include <glm/glm.hpp>
+
 #include <vector>
 
 class Drawable {
@@ -18,16 +20,18 @@ class StaticDrawable : public Drawable {
                    const std::vector<GLfloat>& colors,
                    const std::vector<GLushort>& indices);
 
-    StaticDrawable(const StaticDrawable& rhs) noexcept;
-    StaticDrawable& operator=(const StaticDrawable& rhs) noexcept;
-    StaticDrawable(StaticDrawable&& rhs) noexcept;
-    StaticDrawable& operator=(StaticDrawable&& rhs) noexcept;
+    StaticDrawable(const StaticDrawable& rhs) noexcept = delete;
+    StaticDrawable& operator=(const StaticDrawable& rhs) noexcept = delete;
+    StaticDrawable(StaticDrawable&& rhs) noexcept = delete;
+    StaticDrawable& operator=(StaticDrawable&& rhs) noexcept = delete;
+
+    void set_model_matrix(const glm::mat4 & model_matrix) const;
 
     void draw() const override;
 
+   private:
     GenericShader& shader_program;
 
-   private:
     void configure_vao() const;
 
     VAO vao;

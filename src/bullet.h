@@ -4,7 +4,7 @@
 
 class Bullet : public SpaceObject {
    public:
-    Bullet(GenericShader& p,
+    Bullet(StaticDrawable & bullet_graphic,
            const Mover<glm::vec2>& position = Mover<glm::vec2>(),
            const Mover<float>& angle = Mover<float>());
 };

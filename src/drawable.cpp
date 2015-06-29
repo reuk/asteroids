@@ -14,6 +14,7 @@ StaticDrawable::StaticDrawable(GenericShader& shader_program,
     configure_vao();
 }
 
+/*
 StaticDrawable::StaticDrawable(const StaticDrawable& rhs) noexcept
     : shader_program(rhs.shader_program),
       geometry(move(rhs.geometry)),
@@ -54,6 +55,11 @@ StaticDrawable& StaticDrawable::operator=(StaticDrawable&& rhs) noexcept {
     configure_vao();
 
     return *this;
+}
+*/
+
+void StaticDrawable::set_model_matrix(const glm::mat4 & model_matrix) const {
+    shader_program.set_model_matrix(model_matrix);
 }
 
 void StaticDrawable::draw() const {

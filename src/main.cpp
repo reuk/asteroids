@@ -5,6 +5,7 @@
 #include "windowed_app.h"
 #include "asteroid.h"
 #include "ship.h"
+#include "ship_graphic.h"
 #include "bullet.h"
 #include "screen_boundary.h"
 #include "generic_shader.h"
@@ -37,7 +38,6 @@ class Asteroids : public WindowedApp,
           frame_count(0),
 #endif
           screen_boundary(shader_program),
-          ship(shader_program),
           lives(max_lives) {
         get_window().set_title(name.c_str());
 
@@ -120,7 +120,7 @@ class Asteroids : public WindowedApp,
                 if (lives == 0) {
                     //  TODO game over!
                 }
-                ship = Ship(shader_program);
+                ship = move(Ship());
                 ship.add_listener(this);
             }
         }
@@ -229,7 +229,9 @@ class Asteroids : public WindowedApp,
     float aspect;
 
     ScreenBoundary screen_boundary;
+
     Ship ship;
+
     vector<Bullet> bullets;
     vector<Asteroid> asteroids;
 

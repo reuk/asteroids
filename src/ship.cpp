@@ -10,12 +10,8 @@
 using namespace std;
 using namespace glm;
 
-Ship::Ship(GenericShader& shader_program)
-    : SpaceObject(shader_program,
-                  vector<GLfloat>{0.0, 1.0, 0, 1.0, -1.0, 0, 0.5, -0.5, 0, -0.5,
-                                  -0.5, 0, -1.0, -1.0, 0},
-                  vector<GLfloat>{0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1},
-                  vector<GLushort>{0, 1, 2, 3, 4}, 0.1),
+Ship::Ship()
+    : SpaceObject(ship_graphic, 0.1),
       engine({random_device()()}),
       angle_distribution(0, M_PI * 2),
       delta_distribution(-0.1, 0.1) {}
@@ -38,7 +34,7 @@ void Ship::fire() {
 
     listener_list.call(
         &Listener::ship_gun_fired,
-        Bullet(shader_program, Mover<vec2>(pos, vel), Mover<float>(ang, del)));
+        Bullet(Mover<vec2>(pos, vel), Mover<float>(ang, del)));
 }
 
 void Ship::add_listener(Listener* listener) { listener_list.add(listener); }

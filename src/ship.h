@@ -1,8 +1,10 @@
 #pragma once
 
+#include "ship_graphic.h"
 #include "space_object.h"
 #include "windowed_app.h"
 #include "bullet.h"
+#include "bullet_graphic.h"
 
 #include <random>
 
@@ -13,7 +15,7 @@ class Ship : public SpaceObject, public WindowedApp::Listener {
         virtual void ship_gun_fired(Bullet&& bullet) = 0;
     };
 
-    Ship(GenericShader& p);
+    Ship();
 
     void resize(const glm::vec2& v) override;
     void error(const std::string& s) override;
@@ -41,4 +43,6 @@ class Ship : public SpaceObject, public WindowedApp::Listener {
     std::default_random_engine engine;
     std::uniform_real_distribution<float> angle_distribution;
     std::uniform_real_distribution<float> delta_distribution;
+
+    static const ShipGraphic ship_graphic;
 };
