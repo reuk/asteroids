@@ -25,13 +25,13 @@ class StaticDrawable : public Drawable {
     StaticDrawable(StaticDrawable&& rhs) noexcept = delete;
     StaticDrawable& operator=(StaticDrawable&& rhs) noexcept = delete;
 
-    void set_model_matrix(const glm::mat4 & model_matrix) const;
+    void set_model_matrix(const glm::mat4& model_matrix) const;
 
     void draw() const override;
 
-   private:
     GenericShader& shader_program;
 
+   private:
     void configure_vao() const;
 
     VAO vao;

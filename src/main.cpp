@@ -38,6 +38,10 @@ class Asteroids : public WindowedApp,
           frame_count(0),
 #endif
           screen_boundary(shader_program),
+          ship_graphic(shader_program),
+          bullet_graphic(shader_program),
+          asteroid_graphic(shader_program),
+          ship(ship_graphic, bullet_graphic),
           lives(max_lives) {
         get_window().set_title(name.c_str());
 
@@ -120,7 +124,7 @@ class Asteroids : public WindowedApp,
                 if (lives == 0) {
                     //  TODO game over!
                 }
-                ship = move(Ship());
+                ship = move(Ship(ship_graphic, bullet_graphic));
                 ship.add_listener(this);
             }
         }
@@ -188,7 +192,7 @@ class Asteroids : public WindowedApp,
         auto del = speed_dist(engine);
 
         asteroids.emplace_back(move(Asteroid(
-            shader_program, Mover<vec2>(pos, vel), Mover<float>(ang, del))));
+            asteroid_graphic, Mover<vec2>(pos, vel), Mover<float>(ang, del))));
     }
 
     void split_all_asteroids() {
@@ -230,8 +234,11 @@ class Asteroids : public WindowedApp,
 
     ScreenBoundary screen_boundary;
 
-    Ship ship;
+    ShipGraphic ship_graphic;
+    BulletGraphic bullet_graphic;
+    AsteroidGraphic asteroid_graphic;
 
+    Ship ship;
     vector<Bullet> bullets;
     vector<Asteroid> asteroids;
 

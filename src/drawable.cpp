@@ -58,7 +58,7 @@ StaticDrawable& StaticDrawable::operator=(StaticDrawable&& rhs) noexcept {
 }
 */
 
-void StaticDrawable::set_model_matrix(const glm::mat4 & model_matrix) const {
+void StaticDrawable::set_model_matrix(const glm::mat4& model_matrix) const {
     shader_program.set_model_matrix(model_matrix);
 }
 

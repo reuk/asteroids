@@ -10,11 +10,12 @@
 using namespace std;
 using namespace glm;
 
-Ship::Ship()
+Ship::Ship(ShipGraphic& ship_graphic, BulletGraphic& bullet_graphic)
     : SpaceObject(ship_graphic, 0.1),
       engine({random_device()()}),
       angle_distribution(0, M_PI * 2),
-      delta_distribution(-0.1, 0.1) {}
+      delta_distribution(-0.1, 0.1),
+      bullet_graphic(&bullet_graphic) {}
 
 glm::vec2 Ship::forward_vector() const {
     return rotate(vec2(0, 1), angle.get_current());
@@ -34,7 +35,7 @@ void Ship::fire() {
 
     listener_list.call(
         &Listener::ship_gun_fired,
-        Bullet(Mover<vec2>(pos, vel), Mover<float>(ang, del)));
+        Bullet(*bullet_graphic, Mover<vec2>(pos, vel), Mover<float>(ang, del)));
 }
 
 void Ship::add_listener(Listener* listener) { listener_list.add(listener); }

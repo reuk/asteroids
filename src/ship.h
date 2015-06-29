@@ -15,7 +15,7 @@ class Ship : public SpaceObject, public WindowedApp::Listener {
         virtual void ship_gun_fired(Bullet&& bullet) = 0;
     };
 
-    Ship();
+    Ship(ShipGraphic& ship_graphic, BulletGraphic& bullet_graphic);
 
     void resize(const glm::vec2& v) override;
     void error(const std::string& s) override;
@@ -44,5 +44,5 @@ class Ship : public SpaceObject, public WindowedApp::Listener {
     std::uniform_real_distribution<float> angle_distribution;
     std::uniform_real_distribution<float> delta_distribution;
 
-    static const ShipGraphic ship_graphic;
+    StaticDrawable* bullet_graphic;
 };

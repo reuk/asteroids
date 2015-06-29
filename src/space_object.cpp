@@ -8,13 +8,9 @@
 using namespace std;
 using namespace glm;
 
-SpaceObject::SpaceObject(StaticDrawable& graphic,
-                         float size,
+SpaceObject::SpaceObject(StaticDrawable& graphic, float size,
                          const Mover<vec2>& position, const Mover<float>& angle)
-    : graphic(graphic),
-      position(position),
-      angle(angle),
-      size(size) {}
+    : graphic(&graphic), position(position), angle(angle), size(size) {}
 
 void SpaceObject::draw() const {
     auto scale_matrix = scale(mat4(1), vec3(size));
@@ -23,8 +19,8 @@ void SpaceObject::draw() const {
         translate(mat4(1), vec3(position.get_current(), 0.0f));
     auto model_matrix = position_matrix * angle_matrix * scale_matrix;
 
-    graphic.set_model_matrix(model_matrix);
-    graphic.draw();
+    graphic->set_model_matrix(model_matrix);
+    graphic->draw();
 }
 
 void SpaceObject::update() {
