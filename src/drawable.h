@@ -29,9 +29,9 @@ class StaticDrawable : public Drawable {
 
     void draw() const override;
 
-   private:
     GenericShader& shader_program;
 
+   private:
     void configure_vao() const;
 
     VAO vao;

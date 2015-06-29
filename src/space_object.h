@@ -14,17 +14,12 @@ class SpaceObject : public Updatable, public Drawable {
                 const Mover<glm::vec2> &position = Mover<glm::vec2>(),
                 const Mover<float> &angle = Mover<float>());
 
-    SpaceObject(const SpaceObject& rhs) noexcept = delete;
-    SpaceObject& operator=(const SpaceObject& rhs) noexcept = delete;
-    SpaceObject(SpaceObject&& rhs) = default;
-    SpaceObject& operator=(SpaceObject&& rhs) = default;
-
     void draw() const override;
     void update() override;
 
     bool is_hit(const SpaceObject &obj) const;
 
-    StaticDrawable & graphic;
+    StaticDrawable * graphic;
 
     Mover<glm::vec2> position;
     Mover<float> angle;
