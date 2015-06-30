@@ -7,6 +7,7 @@
 #include "ship.h"
 #include "ship_graphic.h"
 #include "bullet.h"
+#include "life_counter.h"
 #include "screen_boundary.h"
 #include "generic_shader.h"
 #include "key_callback.h"
@@ -19,10 +20,11 @@
 #include <stdexcept>
 #include <iostream>
 #include <vector>
+#include <array>
 #include <list>
 #include <string>
 #include <map>
-#include <unordered_set>
+#include <random>
 
 using namespace std;
 using namespace glm;
@@ -40,9 +42,15 @@ class Asteroids : public WindowedApp,
           screen_boundary(shader_program),
           ship_graphic(shader_program),
           bullet_graphic(shader_program),
-          asteroid_graphic(shader_program),
           ship(ship_graphic, bullet_graphic),
+          life_counter(ship_graphic, 0.02, vec2(-0.9, -0.9)),
           lives(max_lives) {
+
+        for (auto i = 0; i != 20; ++i) {
+            asteroid_graphic.emplace_back(
+                move(AsteroidGraphic(shader_program)));
+        }
+
         get_window().set_title(name.c_str());
 
         Logger::log("GLFW version: ", glfwGetVersionString());
@@ -113,41 +121,60 @@ class Asteroids : public WindowedApp,
 #endif
 
         //  update each entity
+        life_counter.set_lives(lives);
+
         ship.update();
         for (auto&& i : bullets) i.update();
         for (auto&& i : asteroids) i.update();
 
         //  check for collisions
-        for (auto&& i : asteroids) {
-            if (ship.is_hit(i)) {
-                lives -= 1;
-                if (lives == 0) {
-                    //  TODO game over!
-                }
-                ship = move(Ship(ship_graphic, bullet_graphic));
-                ship.add_listener(this);
-            }
-        }
+        {
+            bool ship_to_delete = false;
+            vector<bool> asteroids_to_delete(asteroids.size(), false);
 
-        //  TODO this is slow and terrible
-        vector<bool> asteroids_to_delete(asteroids.size(), false);
-        vector<bool> bullets_to_delete(bullets.size(), false);
-
-        auto i = asteroids.begin();
-        auto id = asteroids_to_delete.begin();
-        for (; i != asteroids.end(); ++i, ++id) {
-            auto j = bullets.begin();
-            auto jd = bullets_to_delete.begin();
-            for (; j != bullets.end(); ++j, ++jd) {
-                if (i->is_hit(*j)) {
+            auto i = asteroids.begin();
+            auto id = asteroids_to_delete.begin();
+            for (; i != asteroids.end(); ++i, ++id) {
+                if (ship.is_hit(*i)) {
+                    ship_to_delete = true;
                     *id = true;
-                    *jd = true;
                 }
+            }
+
+            clear_marked(asteroids, asteroids_to_delete);
+
+            if (ship_to_delete) {
+                ship = Ship(ship_graphic, bullet_graphic);
+                ship.add_listener(this);
+                lives -= 1;
             }
         }
 
-        split_marked(asteroids, asteroids_to_delete);
-        clear_marked(bullets, bullets_to_delete);
+        {
+            vector<bool> asteroids_to_delete(asteroids.size(), false);
+            vector<bool> bullets_to_delete(bullets.size(), false);
+
+            auto i = asteroids.begin();
+            auto id = asteroids_to_delete.begin();
+            for (; i != asteroids.end(); ++i, ++id) {
+                auto j = bullets.begin();
+                auto jd = bullets_to_delete.begin();
+                for (; j != bullets.end(); ++j, ++jd) {
+                    if (i->is_hit(*j)) {
+                        *id = true;
+                        *jd = true;
+                    }
+                }
+            }
+
+            split_marked(asteroids, asteroids_to_delete);
+            clear_marked(bullets, bullets_to_delete);
+        }
+
+        if (lives == -1) {
+            //  TODO display game over
+            lives = max_lives;
+        }
     }
 
     void draw() const override {
@@ -166,6 +193,7 @@ class Asteroids : public WindowedApp,
         ship.draw();
         for (const auto& i : bullets) i.draw();
         for (const auto& i : asteroids) i.draw();
+        life_counter.draw();
         Program::unuse();
     }
 
@@ -191,8 +219,13 @@ class Asteroids : public WindowedApp,
         auto ang = dir_dist(engine);
         auto del = speed_dist(engine);
 
-        asteroids.emplace_back(move(Asteroid(
-            asteroid_graphic, Mover<vec2>(pos, vel), Mover<float>(ang, del))));
+        uniform_int_distribution<decltype(asteroid_graphic.size())>
+            graphic_dist(0, asteroid_graphic.size());
+        auto index = graphic_dist(engine);
+
+        asteroids.emplace_back(
+            move(Asteroid(asteroid_graphic[index], Mover<vec2>(pos, vel),
+                          Mover<float>(ang, del))));
     }
 
     void split_all_asteroids() {
@@ -236,17 +269,19 @@ class Asteroids : public WindowedApp,
 
     ShipGraphic ship_graphic;
     BulletGraphic bullet_graphic;
-    AsteroidGraphic asteroid_graphic;
+    vector<AsteroidGraphic> asteroid_graphic;
 
     Ship ship;
     vector<Bullet> bullets;
     vector<Asteroid> asteroids;
 
+    LifeCounter life_counter;
+
     static const int max_lives;
     int lives;
 };
 
-const string Asteroids::name = "asteroids";
+const string Asteroids::name = "Asteroids";
 const int Asteroids::max_lives = 5;
 
 int main() {

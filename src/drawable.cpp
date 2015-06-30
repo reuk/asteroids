@@ -35,6 +35,7 @@ StaticDrawable& StaticDrawable::operator=(const StaticDrawable& rhs) noexcept {
 
     return *this;
 }
+*/
 
 StaticDrawable::StaticDrawable(StaticDrawable&& rhs) noexcept
     : shader_program(rhs.shader_program),
@@ -56,7 +57,6 @@ StaticDrawable& StaticDrawable::operator=(StaticDrawable&& rhs) noexcept {
 
     return *this;
 }
-*/
 
 void StaticDrawable::set_model_matrix(const glm::mat4& model_matrix) const {
     shader_program.set_model_matrix(model_matrix);

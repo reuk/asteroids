@@ -22,8 +22,8 @@ class StaticDrawable : public Drawable {
 
     StaticDrawable(const StaticDrawable& rhs) noexcept = delete;
     StaticDrawable& operator=(const StaticDrawable& rhs) noexcept = delete;
-    StaticDrawable(StaticDrawable&& rhs) noexcept = delete;
-    StaticDrawable& operator=(StaticDrawable&& rhs) noexcept = delete;
+    StaticDrawable(StaticDrawable&& rhs) noexcept;
+    StaticDrawable& operator=(StaticDrawable&& rhs) noexcept;
 
     void set_model_matrix(const glm::mat4& model_matrix) const;
 
