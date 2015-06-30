@@ -10,7 +10,7 @@ using namespace glm;
 
 SpaceObject::SpaceObject(StaticDrawable& graphic, float size,
                          const Mover<vec2>& position, const Mover<float>& angle)
-    : graphic(&graphic), position(position), angle(angle), size(size) {}
+    : graphic(&graphic), position(position), angle(angle), size(size), inside(false) {}
 
 void SpaceObject::draw() const {
     auto scale_matrix = scale(mat4(1), vec3(size));
@@ -23,11 +23,22 @@ void SpaceObject::draw() const {
     graphic->draw();
 }
 
-void SpaceObject::update() {
-    position.update();
-    angle.update();
+bool SpaceObject::inside_boundary() const {
+    auto p = position.get_current();
+    return all(greaterThan(p, vec2(-1.0f))) && all(greaterThan(vec2(1.0f), p));
+}
 
-    position.set_current(mod(position.get_current() + 1.0f, 2.0f) - 1.0f);
+bool SpaceObject::outside_boundary() const {
+    return ! inside_boundary();
+}
+
+void SpaceObject::update() {
+    if (! inside && inside_boundary()) inside = true;
+    position.update();
+    if (inside)
+        position.set_current(mod(position.get_current() + 1.0f, 2.0f) - 1.0f);
+
+    angle.update();
     angle.set_current(fmod(angle.get_current(), static_cast<float>(M_PI * 2)));
 }
 

@@ -13,6 +13,9 @@ class SpaceObject : public Updatable, public Drawable {
                 const Mover<glm::vec2> &position = Mover<glm::vec2>(),
                 const Mover<float> &angle = Mover<float>());
 
+    bool inside_boundary() const;
+    bool outside_boundary() const;
+
     void draw() const override;
     void update() override;
 
@@ -24,4 +27,6 @@ class SpaceObject : public Updatable, public Drawable {
     Mover<float> angle;
 
     float size;
+
+    bool inside;
 };

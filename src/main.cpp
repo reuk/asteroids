@@ -206,21 +206,25 @@ class Asteroids : public WindowedApp,
 
     void add_asteroid() {
         default_random_engine engine{random_device()()};
-        uniform_real_distribution<float> pos_dist(-1.0, 1.0);
 
-        vec2 pos(pos_dist(engine), pos_dist(engine));
+        auto spawn_distance = 2.0f;
+        auto max_spawn_angle = atan(0.5 / (spawn_distance - 1)) * 0.5;
 
+        uniform_real_distribution<float> spawn_angle_dist(-max_spawn_angle, max_spawn_angle);
         uniform_real_distribution<float> dir_dist(0, 2 * M_PI);
         uniform_real_distribution<float> speed_dist(0.0, 0.01);
 
-        auto direction = dir_dist(engine);
+        auto spawn_angle = dir_dist(engine);
+        auto pos = vec2(sin(spawn_angle), cos(spawn_angle)) * spawn_distance;
+
+        auto direction = spawn_angle + M_PI + spawn_angle_dist(engine);
         auto vel = vec2(sin(direction), cos(direction)) * speed_dist(engine);
 
         auto ang = dir_dist(engine);
         auto del = speed_dist(engine);
 
         uniform_int_distribution<decltype(asteroid_graphic.size())>
-            graphic_dist(0, asteroid_graphic.size());
+            graphic_dist(0, asteroid_graphic.size() - 1);
         auto index = graphic_dist(engine);
 
         asteroids.emplace_back(
