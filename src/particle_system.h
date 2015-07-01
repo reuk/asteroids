@@ -13,50 +13,50 @@
 
 class Particle : public Mover<glm::vec2> {
 public:
-  Particle();
+    Particle();
 
-  void update() override;
+    void update() override;
 
-  bool is_dead() const;
+    bool is_dead() const;
 
-  float lifetime;
+    float lifetime;
 
 private:
-  static glm::vec2 random_angle();
+    static glm::vec2 random_angle();
 
-  static std::default_random_engine engine;
-  static std::uniform_real_distribution<float> angle_dist;
-  static std::uniform_real_distribution<float> speed_dist;
+    static std::default_random_engine engine;
+    static std::uniform_real_distribution<float> angle_dist;
+    static std::uniform_real_distribution<float> speed_dist;
 };
 
 class ParticleSystem : public Drawable, public Updatable {
 public:
-  ParticleSystem(GenericShader &shader_program, const glm::vec2 &position);
+    ParticleSystem(GenericShader &shader_program, const glm::vec2 &position);
 
-  ParticleSystem(const ParticleSystem &rhs) noexcept = delete;
-  ParticleSystem &operator=(const ParticleSystem &rhs) noexcept = delete;
-  ParticleSystem(ParticleSystem &&rhs) noexcept;
-  ParticleSystem &operator=(ParticleSystem &&rhs) noexcept;
+    ParticleSystem(const ParticleSystem &rhs) noexcept = delete;
+    ParticleSystem &operator=(const ParticleSystem &rhs) noexcept = delete;
+    ParticleSystem(ParticleSystem &&rhs) noexcept;
+    ParticleSystem &operator=(ParticleSystem &&rhs) noexcept;
 
-  void draw() const override;
-  void update() override;
+    void draw() const override;
+    void update() override;
 
-  bool is_dead() const;
+    bool is_dead() const;
 
-  GenericShader &shader_program;
+    GenericShader &shader_program;
 
 private:
-  void configure_vao() const;
+    void configure_vao() const;
 
-  static const int starting_particles = 20;
-  glm::vec2 position;
+    static const int starting_particles = 100;
+    glm::vec2 position;
 
-  std::vector<Particle> particles;
+    std::vector<Particle> particles;
 
-  VAO vao;
-  BufferObject<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> geometry;
-  BufferObject<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> colors;
-  BufferObject<GL_ELEMENT_ARRAY_BUFFER, GL_DYNAMIC_DRAW> ibo;
+    VAO vao;
+    BufferObject<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> geometry;
+    BufferObject<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> colors;
+    BufferObject<GL_ELEMENT_ARRAY_BUFFER, GL_DYNAMIC_DRAW> ibo;
 
-  int size;
+    int size;
 };

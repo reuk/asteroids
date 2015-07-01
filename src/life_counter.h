@@ -4,15 +4,15 @@
 
 class LifeCounter : public Drawable {
 public:
-  LifeCounter(StaticDrawable &ship_graphic, float size,
-              const glm::vec2 &position);
+    LifeCounter(StaticDrawable &ship_graphic, float size,
+                const glm::vec2 &position);
 
-  void draw() const override;
+    void draw() const override;
 
-  void set_lives(int lives);
+    void set_lives(int lives);
 
-  StaticDrawable *graphic;
-  float size;
-  glm::vec2 position;
-  int lives;
+    StaticDrawable *graphic;
+    float size;
+    glm::vec2 position;
+    int lives;
 };

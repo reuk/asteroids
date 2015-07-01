@@ -4,5 +4,5 @@
 
 class ShipGraphic : public StaticDrawable {
 public:
-  ShipGraphic(GenericShader &shader_program);
+    ShipGraphic(GenericShader &shader_program);
 };

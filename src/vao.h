@@ -5,14 +5,14 @@
 
 class VAO {
 public:
-  VAO();
-  virtual ~VAO();
+    VAO();
+    virtual ~VAO();
 
-  void bind() const;
-  static void unbind();
+    void bind() const;
+    static void unbind();
 
-  GLuint get_index() const;
+    GLuint get_index() const;
 
 private:
-  GLuint index;
+    GLuint index;
 };

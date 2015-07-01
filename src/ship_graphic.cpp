@@ -8,4 +8,5 @@ ShipGraphic::ShipGraphic(GenericShader &shader_program)
           shader_program, vector<GLfloat>{0.0, 1.0, 0, 1.0, -1.0, 0, 0.5, -0.5,
                                           0, -0.5, -0.5, 0, -1.0, -1.0, 0},
           vector<GLfloat>{0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1},
-          vector<GLushort>{0, 1, 2, 3, 4}) {}
+          vector<GLushort>{0, 1, 2, 3, 4}) {
+}

@@ -4,8 +4,8 @@
 
 class AsteroidGraphic : public StaticDrawable {
 public:
-  AsteroidGraphic(GenericShader &shader_program);
+    AsteroidGraphic(GenericShader &shader_program);
 
 private:
-  static const int POINTS = 10;
+    static const int POINTS = 10;
 };

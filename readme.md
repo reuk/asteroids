@@ -11,11 +11,11 @@ Done
 * Have ship + asteroid classes reference 'static' drawable classes
 * Precompute asteroid shapes and then reuse them
 * Have asteroids get generated offscreen and drift on
+* Particle effects when an asteroid splits
 
 Todo
 ====
 
-* Particle effects when an asteroid splits
 * Tweak spaceship physics/controls
 * Score counter
 * Title screen and game over/leaderboard

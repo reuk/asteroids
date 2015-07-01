@@ -4,5 +4,5 @@
 
 class BulletGraphic : public StaticDrawable {
 public:
-  BulletGraphic(GenericShader &shader_program);
+    BulletGraphic(GenericShader &shader_program);
 };

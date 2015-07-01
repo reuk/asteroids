@@ -4,6 +4,6 @@
 
 class ScreenBoundary : public StaticDrawable {
 public:
-  ScreenBoundary(GenericShader &shader_program);
-  void draw() const override;
+    ScreenBoundary(GenericShader &shader_program);
+    void draw() const override;
 };
