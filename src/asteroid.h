@@ -6,13 +6,13 @@
 #include "asteroid_graphic.h"
 
 class Asteroid : public SpaceObject {
-   public:
-    Asteroid(StaticDrawable& p,
-             const Mover<glm::vec2>& position = Mover<glm::vec2>(),
-             const Mover<float>& angle = Mover<float>(), float size = 0.1);
+public:
+  Asteroid(StaticDrawable &p,
+           const Mover<glm::vec2> &position = Mover<glm::vec2>(),
+           const Mover<float> &angle = Mover<float>(), float size = 0.1);
 
-    std::vector<Asteroid> get_fragments() const;
+  std::vector<Asteroid> get_fragments() const;
 
-   private:
-    static const int POINTS = 10;
+private:
+  static const int POINTS = 10;
 };

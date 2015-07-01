@@ -11,20 +11,20 @@ using namespace glm;
 GenericShader::GenericShader()
     : ShaderProgram(vertex_shader, fragment_shader) {}
 
-void GenericShader::set_matrix(const string& s, const mat4& mat) const {
-    glUniformMatrix4fv(get_uniform_location(s), 1, GL_FALSE, value_ptr(mat));
+void GenericShader::set_matrix(const string &s, const mat4 &mat) const {
+  glUniformMatrix4fv(get_uniform_location(s), 1, GL_FALSE, value_ptr(mat));
 }
 
-void GenericShader::set_model_matrix(const mat4& mat) const {
-    set_matrix("v_model", mat);
+void GenericShader::set_model_matrix(const mat4 &mat) const {
+  set_matrix("v_model", mat);
 }
 
-void GenericShader::set_view_matrix(const mat4& mat) const {
-    set_matrix("v_view", mat);
+void GenericShader::set_view_matrix(const mat4 &mat) const {
+  set_matrix("v_view", mat);
 }
 
-void GenericShader::set_projection_matrix(const mat4& mat) const {
-    set_matrix("v_projection", mat);
+void GenericShader::set_projection_matrix(const mat4 &mat) const {
+  set_matrix("v_projection", mat);
 }
 
 const string GenericShader::vertex_shader(R"(

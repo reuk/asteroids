@@ -4,15 +4,15 @@
 #include <GLFW/glfw3.h>
 
 class VAO {
-   public:
-    VAO();
-    virtual ~VAO();
+public:
+  VAO();
+  virtual ~VAO();
 
-    void bind() const;
-    static void unbind();
+  void bind() const;
+  static void unbind();
 
-    GLuint get_index() const;
+  GLuint get_index() const;
 
-   private:
-    GLuint index;
+private:
+  GLuint index;
 };

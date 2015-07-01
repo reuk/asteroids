@@ -3,7 +3,7 @@
 using namespace std;
 using namespace glm;
 
-ShipGraphic::ShipGraphic(GenericShader& shader_program)
+ShipGraphic::ShipGraphic(GenericShader &shader_program)
     : StaticDrawable(
           shader_program, vector<GLfloat>{0.0, 1.0, 0, 1.0, -1.0, 0, 0.5, -0.5,
                                           0, -0.5, -0.5, 0, -1.0, -1.0, 0},

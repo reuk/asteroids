@@ -3,9 +3,9 @@
 #include "drawable.h"
 
 class AsteroidGraphic : public StaticDrawable {
-   public:
-    AsteroidGraphic(GenericShader& shader_program);
+public:
+  AsteroidGraphic(GenericShader &shader_program);
 
-   private:
-    static const int POINTS = 10;
+private:
+  static const int POINTS = 10;
 };

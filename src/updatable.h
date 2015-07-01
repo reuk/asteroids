@@ -1,8 +1,8 @@
 #pragma once
 
 class Updatable {
-   public:
-    virtual ~Updatable() {}
+public:
+  virtual ~Updatable() {}
 
-    virtual void update() = 0;
+  virtual void update() = 0;
 };

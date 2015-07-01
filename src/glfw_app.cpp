@@ -5,15 +5,15 @@
 using namespace std;
 
 GLFWApp::GLFWApp() {
-    if (!glfwInit()) {
-        throw runtime_error("glfw failed to initialise");
-    }
+  if (!glfwInit()) {
+    throw runtime_error("glfw failed to initialise");
+  }
 }
 
 GLFWApp::~GLFWApp() { glfwTerminate(); }
 
 GLFWerrorfun GLFWApp::set_error_callback(GLFWerrorfun a) {
-    return glfwSetErrorCallback(a);
+  return glfwSetErrorCallback(a);
 }
 
 void GLFWApp::window_hint(int a, int b) { glfwWindowHint(a, b); }

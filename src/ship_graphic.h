@@ -3,6 +3,6 @@
 #include "drawable.h"
 
 class ShipGraphic : public StaticDrawable {
-   public:
-    ShipGraphic(GenericShader& shader_program);
+public:
+  ShipGraphic(GenericShader &shader_program);
 };

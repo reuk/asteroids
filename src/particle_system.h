@@ -4,31 +4,59 @@
 #include "buffer_object.h"
 #include "generic_shader.h"
 #include "mover.h"
+#include "drawable.h"
 
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <random>
 
-using Particle = Mover<glm::vec2>;
 class Particle : public Mover<glm::vec2> {
 public:
-    void update() override;
+  Particle();
 
-    bool is_dead() const;
+  void update() override;
+
+  bool is_dead() const;
+
+  float lifetime;
+
 private:
-    float lifetime;
-}
+  static glm::vec2 random_angle();
 
-class ParticleSystem: public Drawable, public Updatable {
+  static std::default_random_engine engine;
+  static std::uniform_real_distribution<float> angle_dist;
+  static std::uniform_real_distribution<float> speed_dist;
+};
+
+class ParticleSystem : public Drawable, public Updatable {
 public:
-    void draw() const override;
-    void update() override;
-private:
-    static const int starting_particles = 50;
-    vector<Particle> particles;
+  ParticleSystem(GenericShader &shader_program, const glm::vec2 &position);
 
-    VAO vao;
-    BufferObject<GL_ARRAY_BUFFER, TODO> vbo;
-    BufferObject<GL_ARRAY_BUFFER, TODO> colors;
-    BufferObject<GL_ELEMENT_ARRAY_BUFFER, TODO> ibo;
+  ParticleSystem(const ParticleSystem &rhs) noexcept = delete;
+  ParticleSystem &operator=(const ParticleSystem &rhs) noexcept = delete;
+  ParticleSystem(ParticleSystem &&rhs) noexcept;
+  ParticleSystem &operator=(ParticleSystem &&rhs) noexcept;
+
+  void draw() const override;
+  void update() override;
+
+  bool is_dead() const;
+
+  GenericShader &shader_program;
+
+private:
+  void configure_vao() const;
+
+  static const int starting_particles = 20;
+  glm::vec2 position;
+
+  std::vector<Particle> particles;
+
+  VAO vao;
+  BufferObject<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> geometry;
+  BufferObject<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> colors;
+  BufferObject<GL_ELEMENT_ARRAY_BUFFER, GL_DYNAMIC_DRAW> ibo;
+
+  int size;
 };

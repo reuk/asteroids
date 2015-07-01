@@ -15,14 +15,14 @@ LifeCounter::LifeCounter(StaticDrawable &ship_graphic, float size,
 void LifeCounter::set_lives(int l) { lives = l; }
 
 void LifeCounter::draw() const {
-    auto scale_matrix = scale(mat4(1), vec3(size));
+  auto scale_matrix = scale(mat4(1), vec3(size));
 
-    for (auto i = 0; i != lives; ++i) {
-        auto position_matrix = translate(
-            mat4(1), vec3(position.x + i * 2.5 * size, position.y, 0.0f));
-        auto model_matrix = position_matrix * scale_matrix;
+  for (auto i = 0; i != lives; ++i) {
+    auto position_matrix =
+        translate(mat4(1), vec3(position.x + i * 2.5 * size, position.y, 0.0f));
+    auto model_matrix = position_matrix * scale_matrix;
 
-        graphic->set_model_matrix(model_matrix);
-        graphic->draw();
-    }
+    graphic->set_model_matrix(model_matrix);
+    graphic->draw();
+  }
 }
