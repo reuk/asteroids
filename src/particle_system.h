@@ -20,6 +20,7 @@ public:
     bool is_dead() const;
 
     float lifetime;
+    float lifetime_decrease;
 
 private:
     static glm::vec2 random_angle();
@@ -27,6 +28,7 @@ private:
     static std::default_random_engine engine;
     static std::uniform_real_distribution<float> angle_dist;
     static std::uniform_real_distribution<float> speed_dist;
+    static std::uniform_real_distribution<float> decrease_dist;
 };
 
 class ParticleSystem : public Drawable, public Updatable {

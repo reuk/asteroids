@@ -21,11 +21,12 @@ vec2 Particle::random_angle() {
 
 Particle::Particle()
     : Mover(vec2(0.0f), random_angle() * speed_dist(engine))
-    , lifetime(1.0f) {
+    , lifetime(1.0f)
+    , lifetime_decrease(decrease_dist(engine)) {
 }
 
 void Particle::update() {
-    lifetime -= 0.01;
+    lifetime -= lifetime_decrease;
     Mover::update();
 }
 
@@ -36,6 +37,7 @@ bool Particle::is_dead() const {
 default_random_engine Particle::engine{random_device()()};
 uniform_real_distribution<float> Particle::angle_dist(0, 2 * M_PI);
 uniform_real_distribution<float> Particle::speed_dist(0, 0.05);
+uniform_real_distribution<float> Particle::decrease_dist(0, 0.02);
 
 //  PARTICLE SYSTEM
 
