@@ -21,3 +21,5 @@ target_link_libraries(
     ${GLEW_LIBRARY}
     ${GLFW_STATIC_LIBRARIES}
     ${FREETYPE_LIBRARIES})
+
+file(COPY Hyperspace.otf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

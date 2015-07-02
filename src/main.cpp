@@ -10,6 +10,7 @@
 #include "life_counter.h"
 #include "screen_boundary.h"
 #include "generic_shader.h"
+#include "score_counter.h"
 #include "key_callback.h"
 #include "particle_system.h"
 
@@ -27,6 +28,8 @@
 #include <map>
 #include <random>
 
+//#define DEBUG
+
 using namespace std;
 using namespace glm;
 
@@ -41,16 +44,18 @@ public:
         , frame_count(0)
         ,
 #endif
-        screen_boundary(shader_program)
-        , ship_graphic(shader_program)
-        , bullet_graphic(shader_program)
+        screen_boundary(generic_shader)
+        , ship_graphic(generic_shader)
+        , bullet_graphic(generic_shader)
         , ship(ship_graphic, bullet_graphic)
-        , life_counter(ship_graphic, 0.02, vec2(-0.9, -0.9))
-        , lives(max_lives) {
+        , life_counter(ship_graphic, 0.03, vec2(-0.9, -0.9))
+        , score_counter(score_counter_shader, vec2(-0.9, -0.91))
+        , lives(max_lives)
+        , score(0) {
 
         for (auto i = 0; i != 20; ++i) {
             asteroid_graphic.emplace_back(
-                move(AsteroidGraphic(shader_program)));
+                move(AsteroidGraphic(generic_shader)));
         }
 
         get_window().set_title(name.c_str());
@@ -59,7 +64,11 @@ public:
         Logger::log("Renderer: ", glGetString(GL_RENDERER));
         Logger::log("OpenGL version: ", glGetString(GL_VERSION));
 
-        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_TEXTURE_2D);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDepthFunc(GL_LESS);
 
         //  register listeners
@@ -122,9 +131,6 @@ public:
         frame_count++;
 #endif
 
-        //  update each entity
-        life_counter.set_lives(lives);
-
         ship.update();
         for (auto &&i : bullets)
             i.update();
@@ -150,7 +156,7 @@ public:
             for (; i != asteroids.end(); ++i, ++id) {
                 if (*id) {
                     particle_system.emplace_back(move(ParticleSystem(
-                        shader_program, i->position.get_current())));
+                        generic_shader, i->position.get_current())));
                 }
             }
 
@@ -185,7 +191,9 @@ public:
             for (; i != asteroids.end(); ++i, ++id) {
                 if (*id) {
                     particle_system.emplace_back(move(ParticleSystem(
-                        shader_program, i->position.get_current())));
+                        generic_shader, i->position.get_current())));
+
+                    score += 1000 * i->size;
                 }
             }
 
@@ -206,17 +214,21 @@ public:
             else
                 ++i;
         }
+
+        //  update each entity
+        life_counter.set_lives(lives);
+        score_counter.set_score(score);
     }
 
     void draw() const override {
-        shader_program.use();
-
         auto view_matrix =
             lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
-        shader_program.set_view_matrix(view_matrix);
-
         auto projection_matrix = perspective(45.0f, aspect, 0.1f, 10.0f);
-        shader_program.set_projection_matrix(projection_matrix);
+
+        generic_shader.use();
+
+        generic_shader.set_projection_matrix(projection_matrix);
+        generic_shader.set_view_matrix(view_matrix);
 
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -229,6 +241,10 @@ public:
         life_counter.draw();
         for (const auto &i : particle_system)
             i.draw();
+        Program::unuse();
+
+        score_counter_shader.use();
+        score_counter.draw();
         Program::unuse();
     }
 
@@ -300,7 +316,8 @@ public:
 private:
     static const string name;
 
-    GenericShader shader_program;
+    GenericShader generic_shader;
+    ScoreCounterShader score_counter_shader;
 
 #ifdef DEBUG
     double previous_seconds;
@@ -321,9 +338,12 @@ private:
     vector<ParticleSystem> particle_system;
 
     LifeCounter life_counter;
+    ScoreCounter score_counter;
 
     static const int max_lives;
     int lives;
+
+    int score;
 };
 
 const string Asteroids::name = "Asteroids";
