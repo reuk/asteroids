@@ -1,7 +1,7 @@
 Asteroids
 =========
 
-A little version of Asteroids in C++14 using just GLFW, GLEW, and GLM.
+A little version of Asteroids in C++14 using just GLFW, GLEW, GLM, and FreeType.
 
 Done
 ====
