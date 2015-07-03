@@ -2,8 +2,5 @@
 
 class Updatable {
 public:
-    virtual ~Updatable() {
-    }
-
-    virtual void update() = 0;
+    virtual void update(float dt) = 0;
 };

@@ -124,7 +124,7 @@ public:
         t.insert(t.end(), to_insert.begin(), to_insert.end());
     }
 
-    void update() override {
+    void update(float dt) override {
 #ifdef DEBUG
         auto current_seconds = glfwGetTime();
         auto elapsed_seconds = current_seconds - previous_seconds;
@@ -142,11 +142,20 @@ public:
 #endif
 
         if (state == GameState::PLAYING) {
-            ship.update();
+            ship.add_listener(this);
+
+            ship.update(dt);
             for (auto &&i : bullets)
-                i.update();
+                i.update(dt);
             for (auto &&i : asteroids)
-                i.update();
+                i.update(dt);
+
+            //  randomly add asteroids
+            uniform_real_distribution<float> spawn_dist(0, 1);
+            auto spawn_probability = 0.002;
+            if (spawn_dist(engine) < spawn_probability) {
+                add_asteroid();
+            }
 
             //  check for collisions
             {
@@ -174,8 +183,6 @@ public:
                 clear_marked(asteroids, asteroids_to_delete);
 
                 if (ship_to_delete) {
-                    //ship = Ship(ship_graphic, bullet_graphic);
-                    //ship.add_listener(this);
                     lives -= 1;
                 }
             }
@@ -219,7 +226,7 @@ public:
             }
 
             for (auto i = particle_system.begin(); i != particle_system.end();) {
-                i->update();
+                i->update(dt);
 
                 if (i->is_dead())
                     i = particle_system.erase(i);
@@ -283,8 +290,6 @@ public:
     }
 
     void add_asteroid() {
-        default_random_engine engine{random_device()()};
-
         auto spawn_distance = 2.0f;
         auto max_spawn_angle = atan(0.5 / (spawn_distance - 1)) * 0.5;
 
@@ -316,7 +321,6 @@ public:
         bullets.clear();
         particle_system.clear();
         ship = Ship(ship_graphic, bullet_graphic);
-        ship.add_listener(this);
         lives = max_lives;
         score = 0;
         state = GameState::PLAYING;
@@ -341,12 +345,14 @@ public:
                 key);
             break;
         case GameState::PLAYING:
+            /*
             key_dispatch<decltype(&Asteroids::add_asteroid)>(
                 this,
                 {
                     {GLFW_KEY_N, &Asteroids::add_asteroid},
                 },
                 key);
+            */
             break;
         case GameState::OVER:
             key_dispatch<decltype(&Asteroids::start_game)>(
@@ -401,10 +407,13 @@ private:
     int score;
 
     GameState state;
+
+    static default_random_engine engine;
 };
 
 const string Asteroids::name = "Asteroids";
 const int Asteroids::max_lives = 5;
+default_random_engine Asteroids::engine{random_device()()};
 
 int main() {
     Logger::restart();

@@ -10,8 +10,8 @@ public:
         , delta(delta) {
     }
 
-    void update() override {
-        current += delta;
+    void update(float dt) override {
+        current += delta * dt;
     }
     void impulse(const T &t) {
         delta += t;

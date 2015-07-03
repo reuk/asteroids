@@ -1,6 +1,7 @@
-#include "drawable.h"
+#include "static_drawable.h"
 
 using namespace std;
+using namespace glm;
 
 StaticDrawable::StaticDrawable(GenericShader &shader_program,
                                const vector<GLfloat> &g,
@@ -36,7 +37,7 @@ StaticDrawable &StaticDrawable::operator=(StaticDrawable &&rhs) noexcept {
     return *this;
 }
 
-void StaticDrawable::set_model_matrix(const glm::mat4 &model_matrix) const {
+void StaticDrawable::set_model_matrix(const mat4 &model_matrix) const {
     shader_program.set_model_matrix(model_matrix);
 }
 

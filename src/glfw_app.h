@@ -2,7 +2,10 @@
 
 #include <GLFW/glfw3.h>
 
-class GLFWApp {
+#include "updatable.h"
+#include "drawable.h"
+
+class GLFWApp: public Updatable, public Drawable {
 public:
     GLFWApp();
     virtual ~GLFWApp();
@@ -12,7 +15,4 @@ public:
     static void swap_interval(int);
     static double get_time();
     static void poll_events();
-
-    virtual void update() = 0;
-    virtual void draw() const = 0;
 };

@@ -39,4 +39,5 @@ private:
     static glm::vec2 size;
     static ListenerList<Listener> listener_list;
     Window window;
+    double previous_seconds;
 };

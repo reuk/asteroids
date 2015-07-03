@@ -1,6 +1,6 @@
 #pragma once
 
-#include "drawable.h"
+#include "static_drawable.h"
 
 class AsteroidGraphic : public StaticDrawable {
 public:

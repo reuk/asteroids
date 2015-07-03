@@ -3,7 +3,7 @@
 #include "mover.h"
 #include "generic_shader.h"
 #include "updatable.h"
-#include "drawable.h"
+#include "static_drawable.h"
 
 #include <glm/glm.hpp>
 
@@ -17,7 +17,7 @@ public:
     bool outside_boundary() const;
 
     void draw() const override;
-    void update() override;
+    void update(float dt) override;
 
     bool is_hit(const SpaceObject &obj) const;
 

@@ -25,9 +25,9 @@ Particle::Particle()
     , lifetime_decrease(decrease_dist(engine)) {
 }
 
-void Particle::update() {
-    lifetime -= lifetime_decrease;
-    Mover::update();
+void Particle::update(float dt) {
+    lifetime -= lifetime_decrease * dt;
+    Mover::update(dt);
 }
 
 bool Particle::is_dead() const {
@@ -104,9 +104,9 @@ vector<vec3> point_colors(const vector<Particle> &v) {
     return ret;
 }
 
-void ParticleSystem::update() {
+void ParticleSystem::update(float dt) {
     for (auto i = particles.begin(); i != particles.end();) {
-        i->update();
+        i->update(dt);
 
         if (i->is_dead())
             i = particles.erase(i);

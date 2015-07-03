@@ -37,14 +37,14 @@ bool SpaceObject::outside_boundary() const {
     return !inside_boundary();
 }
 
-void SpaceObject::update() {
+void SpaceObject::update(float dt) {
     if (!inside && inside_boundary())
         inside = true;
-    position.update();
+    position.update(dt);
     if (inside)
         position.set_current(mod(position.get_current() + 1.0f, 2.0f) - 1.0f);
 
-    angle.update();
+    angle.update(dt);
     angle.set_current(fmod(angle.get_current(), static_cast<float>(M_PI * 2)));
 }
 

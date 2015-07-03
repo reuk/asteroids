@@ -35,7 +35,14 @@ void WindowedApp::run() {
     listener_list.call(&Listener::resize, vec2(w, h));
 
     while (!window.get_should_close()) {
-        update();
+        auto ct = glfwGetTime();
+        auto dt = ct - previous_seconds;
+        previous_seconds = ct;
+
+        auto estimated_frame_rate = 60;
+        dt *= estimated_frame_rate;
+
+        update(dt);
         draw();
 
         window.swap_buffers();

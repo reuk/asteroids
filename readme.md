@@ -18,6 +18,7 @@ Done
 Todo
 ====
 
+* Proper delta-time operation rather than per-frame
 * Tweak spaceship physics/controls
 * Title screen and game over/leaderboard
 * Powerups + bonuses

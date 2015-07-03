@@ -15,7 +15,7 @@ class Particle : public Mover<glm::vec2> {
 public:
     Particle();
 
-    void update() override;
+    void update(float dt) override;
 
     bool is_dead() const;
 
@@ -41,7 +41,7 @@ public:
     ParticleSystem &operator=(ParticleSystem &&rhs) noexcept;
 
     void draw() const override;
-    void update() override;
+    void update(float dt) override;
 
     bool is_dead() const;
 
