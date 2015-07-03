@@ -28,7 +28,8 @@ TextHandler::~TextHandler() {
     error = FT_Done_FreeType(library);
 }
 
-void TextHandler::draw(const string & s, int pixel_height, const vec2 & position) const {
+void TextHandler::draw(const string & s, int pixel_height,
+                       const vec2 & position) const {
     FT_Set_Pixel_Sizes(face, 0, pixel_height);
 
     auto pos = position;

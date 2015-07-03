@@ -14,7 +14,8 @@ public:
     TextHandler(TextShader & shader_program);
     virtual ~TextHandler();
 
-    void draw(const std::string & s, int pixel_height, const glm::vec2 & position) const;
+    void draw(const std::string & s, int pixel_height,
+              const glm::vec2 & position) const;
     float measure(const std::string & s, int pixel_height) const;
 
 private:

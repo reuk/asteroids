@@ -5,7 +5,7 @@
 #include "updatable.h"
 #include "drawable.h"
 
-class GLFWApp: public Updatable, public Drawable {
+class GLFWApp : public Updatable, public Drawable {
 public:
     GLFWApp();
     virtual ~GLFWApp();

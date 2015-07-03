@@ -37,13 +37,7 @@ class Asteroids : public WindowedApp,
                   public WindowedApp::Listener,
                   public Ship::Listener {
 public:
-
-    enum class GameState {
-        TITLE,
-        PLAYING,
-        PAUSED,
-        OVER
-    };
+    enum class GameState { TITLE, PLAYING, PAUSED, OVER };
 
     Asteroids()
         :
@@ -222,7 +216,8 @@ public:
                 life_counter.set_lives(lives);
             }
 
-            for (auto i = particle_system.begin(); i != particle_system.end();) {
+            for (auto i = particle_system.begin();
+                 i != particle_system.end();) {
                 i->update(dt);
 
                 if (i->is_dead())
@@ -334,32 +329,32 @@ public:
             return;
 
         switch (state) {
-        case GameState::TITLE:
-            key_dispatch<decltype(&Asteroids::start_game)>(
-                this,
-                {
-                    {GLFW_KEY_SPACE, &Asteroids::start_game},
-                },
-                key);
-            break;
-        case GameState::PLAYING:
-            /*
-            key_dispatch<decltype(&Asteroids::add_asteroid)>(
-                this,
-                {
-                    {GLFW_KEY_N, &Asteroids::add_asteroid},
-                },
-                key);
-            */
-            break;
-        case GameState::OVER:
-            key_dispatch<decltype(&Asteroids::start_game)>(
-                this,
-                {
-                    {GLFW_KEY_SPACE, &Asteroids::start_game},
-                },
-                key);
-            break;
+            case GameState::TITLE:
+                key_dispatch<decltype(&Asteroids::start_game)>(
+                    this,
+                    {
+                        {GLFW_KEY_SPACE, &Asteroids::start_game},
+                    },
+                    key);
+                break;
+            case GameState::PLAYING:
+                /*
+                key_dispatch<decltype(&Asteroids::add_asteroid)>(
+                    this,
+                    {
+                        {GLFW_KEY_N, &Asteroids::add_asteroid},
+                    },
+                    key);
+                */
+                break;
+            case GameState::OVER:
+                key_dispatch<decltype(&Asteroids::start_game)>(
+                    this,
+                    {
+                        {GLFW_KEY_SPACE, &Asteroids::start_game},
+                    },
+                    key);
+                break;
         }
     }
 
