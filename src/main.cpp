@@ -37,6 +37,14 @@ class Asteroids : public WindowedApp,
                   public WindowedApp::Listener,
                   public Ship::Listener {
 public:
+
+    enum class GameState {
+        TITLE,
+        PLAYING,
+        PAUSED,
+        OVER
+    };
+
     Asteroids()
         :
 #ifdef DEBUG
@@ -52,8 +60,10 @@ public:
         , score_handler(text_shader, vec2(-0.9, -0.91))
         , title_handler(text_shader, vec2(-0.9, 0.7))
         , press_space_handler(text_shader, vec2(-0.9, 0.6))
+        , game_over_handler(text_shader, vec2(-0.9, 0.7))
         , lives(max_lives)
-        , score(0) {
+        , score(0)
+        , state(GameState::TITLE) {
 
         for (auto i = 0; i != 20; ++i) {
             asteroid_graphic.emplace_back(
@@ -76,8 +86,6 @@ public:
         //  register listeners
         add_listener(this);
         add_listener(&ship);
-
-        ship.add_listener(this);
     }
 
     template <typename T>
@@ -133,92 +141,92 @@ public:
         frame_count++;
 #endif
 
-        ship.update();
-        for (auto &&i : bullets)
-            i.update();
-        for (auto &&i : asteroids)
-            i.update();
+        if (state == GameState::PLAYING) {
+            ship.update();
+            for (auto &&i : bullets)
+                i.update();
+            for (auto &&i : asteroids)
+                i.update();
 
-        //  check for collisions
-        {
-            bool ship_to_delete = false;
-            vector<bool> asteroids_to_delete(asteroids.size(), false);
+            //  check for collisions
+            {
+                bool ship_to_delete = false;
+                vector<bool> asteroids_to_delete(asteroids.size(), false);
 
-            auto i = asteroids.begin();
-            auto id = asteroids_to_delete.begin();
-            for (; i != asteroids.end(); ++i, ++id) {
-                if (ship.is_hit(*i)) {
-                    ship_to_delete = true;
-                    *id = true;
-                }
-            }
-
-            i = asteroids.begin();
-            id = asteroids_to_delete.begin();
-            for (; i != asteroids.end(); ++i, ++id) {
-                if (*id) {
-                    particle_system.emplace_back(move(ParticleSystem(
-                        generic_shader, i->position.get_current())));
-                }
-            }
-
-            clear_marked(asteroids, asteroids_to_delete);
-
-            if (ship_to_delete) {
-                ship = Ship(ship_graphic, bullet_graphic);
-                ship.add_listener(this);
-                lives -= 1;
-            }
-        }
-
-        {
-            vector<bool> asteroids_to_delete(asteroids.size(), false);
-            vector<bool> bullets_to_delete(bullets.size(), false);
-
-            auto i = asteroids.begin();
-            auto id = asteroids_to_delete.begin();
-            for (; i != asteroids.end(); ++i, ++id) {
-                auto j = bullets.begin();
-                auto jd = bullets_to_delete.begin();
-                for (; j != bullets.end(); ++j, ++jd) {
-                    if (i->is_hit(*j)) {
+                auto i = asteroids.begin();
+                auto id = asteroids_to_delete.begin();
+                for (; i != asteroids.end(); ++i, ++id) {
+                    if (ship.is_hit(*i)) {
+                        ship_to_delete = true;
                         *id = true;
-                        *jd = true;
                     }
                 }
-            }
 
-            i = asteroids.begin();
-            id = asteroids_to_delete.begin();
-            for (; i != asteroids.end(); ++i, ++id) {
-                if (*id) {
-                    particle_system.emplace_back(move(ParticleSystem(
-                        generic_shader, i->position.get_current())));
+                i = asteroids.begin();
+                id = asteroids_to_delete.begin();
+                for (; i != asteroids.end(); ++i, ++id) {
+                    if (*id) {
+                        particle_system.emplace_back(move(ParticleSystem(
+                            generic_shader, i->position.get_current())));
+                    }
+                }
 
-                    score += 1000 * i->size;
+                clear_marked(asteroids, asteroids_to_delete);
+
+                if (ship_to_delete) {
+                    //ship = Ship(ship_graphic, bullet_graphic);
+                    //ship.add_listener(this);
+                    lives -= 1;
                 }
             }
 
-            split_marked(asteroids, asteroids_to_delete);
-            clear_marked(bullets, bullets_to_delete);
+            {
+                vector<bool> asteroids_to_delete(asteroids.size(), false);
+                vector<bool> bullets_to_delete(bullets.size(), false);
+
+                auto i = asteroids.begin();
+                auto id = asteroids_to_delete.begin();
+                for (; i != asteroids.end(); ++i, ++id) {
+                    auto j = bullets.begin();
+                    auto jd = bullets_to_delete.begin();
+                    for (; j != bullets.end(); ++j, ++jd) {
+                        if (i->is_hit(*j)) {
+                            *id = true;
+                            *jd = true;
+                        }
+                    }
+                }
+
+                i = asteroids.begin();
+                id = asteroids_to_delete.begin();
+                for (; i != asteroids.end(); ++i, ++id) {
+                    if (*id) {
+                        particle_system.emplace_back(move(ParticleSystem(
+                            generic_shader, i->position.get_current())));
+
+                        score += 1000 * i->size;
+                    }
+                }
+
+                split_marked(asteroids, asteroids_to_delete);
+                clear_marked(bullets, bullets_to_delete);
+            }
+
+            if (lives == -1) {
+                stop_game();
+            } else {
+                life_counter.set_lives(lives);
+            }
+
+            for (auto i = particle_system.begin(); i != particle_system.end();) {
+                i->update();
+
+                if (i->is_dead())
+                    i = particle_system.erase(i);
+                else
+                    ++i;
+            }
         }
-
-        if (lives == -1) {
-            //  TODO display game over
-            lives = max_lives;
-        }
-
-        for (auto i = particle_system.begin(); i != particle_system.end();) {
-            i->update();
-
-            if (i->is_dead())
-                i = particle_system.erase(i);
-            else
-                ++i;
-        }
-
-        //  update each entity
-        life_counter.set_lives(lives);
     }
 
     void draw() const override {
@@ -233,26 +241,35 @@ public:
 
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // screen_boundary.draw();
-        ship.draw();
-        for (const auto &i : bullets)
-            i.draw();
-        for (const auto &i : asteroids)
-            i.draw();
-        life_counter.draw();
-        for (const auto &i : particle_system)
-            i.draw();
+
+        if (state == GameState::PLAYING) {
+            ship.draw();
+            for (const auto &i : bullets)
+                i.draw();
+            for (const auto &i : asteroids)
+                i.draw();
+            life_counter.draw();
+            for (const auto &i : particle_system)
+                i.draw();
+        }
+
         Program::unuse();
 
         text_shader.use();
 
-        auto score_string = to_string(score);
-        stringstream ss;
-        ss << setw(8) << score_string;
+        if (state == GameState::PLAYING) {
+            auto score_string = to_string(score);
+            stringstream ss;
+            ss << setw(8) << score_string;
 
-        score_handler.draw(ss.str(), 20);
-        title_handler.draw("asteroids", 50);
-        press_space_handler.draw("press space to start", 20);
+            score_handler.draw(ss.str(), 20);
+        } else if (state == GameState::TITLE) {
+            title_handler.draw("asteroids", 50);
+            press_space_handler.draw("press space to start", 20);
+        } else if (state == GameState::OVER) {
+            game_over_handler.draw("game over", 50);
+        }
+
         Program::unuse();
     }
 
@@ -294,31 +311,58 @@ public:
                           Mover<float>(ang, del))));
     }
 
-    void split_all_asteroids() {
-        vector<Asteroid> new_asteroids;
-        for (auto &&i : asteroids) {
-            auto fragments = i.get_fragments();
-            new_asteroids.insert(new_asteroids.end(), fragments.begin(),
-                                 fragments.end());
-        }
-        asteroids = new_asteroids;
+    void start_game() {
+        asteroids.clear();
+        bullets.clear();
+        particle_system.clear();
+        ship = Ship(ship_graphic, bullet_graphic);
+        ship.add_listener(this);
+        lives = max_lives;
+        score = 0;
+        state = GameState::PLAYING;
+    }
+
+    void stop_game() {
+        ship.remove_listener(this);
+        state = GameState::OVER;
     }
 
     void key(int key, int scancode, int action, int mods) override {
         if (!(action == GLFW_PRESS || action == GLFW_REPEAT))
             return;
 
-        key_dispatch<decltype(&Asteroids::add_asteroid)>(
-            this,
-            {
-                {GLFW_KEY_N, &Asteroids::add_asteroid},
-                {GLFW_KEY_M, &Asteroids::split_all_asteroids},
-            },
-            key);
+        switch (state) {
+        case GameState::TITLE:
+            key_dispatch<decltype(&Asteroids::start_game)>(
+                this,
+                {
+                    {GLFW_KEY_SPACE, &Asteroids::start_game},
+                },
+                key);
+            break;
+        case GameState::PLAYING:
+            key_dispatch<decltype(&Asteroids::add_asteroid)>(
+                this,
+                {
+                    {GLFW_KEY_N, &Asteroids::add_asteroid},
+                },
+                key);
+            break;
+        case GameState::OVER:
+            key_dispatch<decltype(&Asteroids::start_game)>(
+                this,
+                {
+                    {GLFW_KEY_SPACE, &Asteroids::start_game},
+                },
+                key);
+            break;
+        }
     }
 
     void ship_gun_fired(Bullet &&bullet) override {
-        bullets.emplace_back(move(bullet));
+        if (state == GameState::PLAYING) {
+            bullets.emplace_back(move(bullet));
+        }
     }
 
 private:
@@ -349,11 +393,14 @@ private:
     TextHandler score_handler;
     TextHandler title_handler;
     TextHandler press_space_handler;
+    TextHandler game_over_handler;
 
     static const int max_lives;
     int lives;
 
     int score;
+
+    GameState state;
 };
 
 const string Asteroids::name = "Asteroids";
