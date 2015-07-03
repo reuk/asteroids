@@ -21,8 +21,7 @@ void Texture::unbind() {
 
 void Texture::data(GLsizei w, GLsizei h, GLubyte * t) const {
     bind();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE,
-                 t);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, t);
 }
 
 GLuint Texture::get_index() const {

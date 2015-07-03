@@ -35,9 +35,9 @@ private:
     void configure_vao() const;
 
     VAO vao;
-    VBO geometry;
-    VBO colors;
-    IBO ibo;
+    StaticVBO geometry;
+    StaticVBO colors;
+    StaticIBO ibo;
 
     int size;
 };

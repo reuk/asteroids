@@ -5,9 +5,9 @@
 
 #include <glm/glm.hpp>
 
-class ScoreCounterShader : public ShaderProgram {
+class TextShader : public ShaderProgram {
 public:
-    ScoreCounterShader();
+    TextShader();
 
     void set_model_matrix(const glm::mat4 &mat) const;
     void set_view_matrix(const glm::mat4 &mat) const;

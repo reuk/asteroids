@@ -56,9 +56,9 @@ private:
     std::vector<Particle> particles;
 
     VAO vao;
-    BufferObject<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> geometry;
-    BufferObject<GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW> colors;
-    BufferObject<GL_ELEMENT_ARRAY_BUFFER, GL_DYNAMIC_DRAW> ibo;
+    StaticVBO geometry;
+    StaticVBO colors;
+    StaticIBO ibo;
 
     int size;
 };

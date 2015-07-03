@@ -13,11 +13,11 @@ Done
 * Have asteroids get generated offscreen and drift on
 * Particle effects when an asteroid splits
 * Score counter
+* Find a way of bundling the score counter font into the app
 
 Todo
 ====
 
-* Find a way of bundling the score counter font into the app
 * Tweak spaceship physics/controls
 * Title screen and game over/leaderboard
 * Powerups + bonuses

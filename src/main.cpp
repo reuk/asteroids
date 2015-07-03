@@ -10,7 +10,7 @@
 #include "life_counter.h"
 #include "screen_boundary.h"
 #include "generic_shader.h"
-#include "score_counter.h"
+#include "text_handler.h"
 #include "key_callback.h"
 #include "particle_system.h"
 
@@ -49,7 +49,9 @@ public:
         , bullet_graphic(generic_shader)
         , ship(ship_graphic, bullet_graphic)
         , life_counter(ship_graphic, 0.03, vec2(-0.9, -0.9))
-        , score_counter(score_counter_shader, vec2(-0.9, -0.91))
+        , score_handler(text_shader, vec2(-0.9, -0.91))
+        , title_handler(text_shader, vec2(-0.9, 0.7))
+        , press_space_handler(text_shader, vec2(-0.9, 0.6))
         , lives(max_lives)
         , score(0) {
 
@@ -217,7 +219,6 @@ public:
 
         //  update each entity
         life_counter.set_lives(lives);
-        score_counter.set_score(score);
     }
 
     void draw() const override {
@@ -243,8 +244,15 @@ public:
             i.draw();
         Program::unuse();
 
-        score_counter_shader.use();
-        score_counter.draw();
+        text_shader.use();
+
+        auto score_string = to_string(score);
+        stringstream ss;
+        ss << setw(8) << score_string;
+
+        score_handler.draw(ss.str(), 20);
+        title_handler.draw("asteroids", 50);
+        press_space_handler.draw("press space to start", 20);
         Program::unuse();
     }
 
@@ -317,7 +325,7 @@ private:
     static const string name;
 
     GenericShader generic_shader;
-    ScoreCounterShader score_counter_shader;
+    TextShader text_shader;
 
 #ifdef DEBUG
     double previous_seconds;
@@ -338,7 +346,9 @@ private:
     vector<ParticleSystem> particle_system;
 
     LifeCounter life_counter;
-    ScoreCounter score_counter;
+    TextHandler score_handler;
+    TextHandler title_handler;
+    TextHandler press_space_handler;
 
     static const int max_lives;
     int lives;
