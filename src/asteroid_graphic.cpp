@@ -28,6 +28,6 @@ vector<vec3> noise_circle(int points) {
 
 AsteroidGraphic::AsteroidGraphic(GenericShader &shader_program)
     : StaticDrawable(shader_program, format(noise_circle(POINTS)),
-                     format(vector<vec3>(POINTS, vec3(0, 1, 1))),
+                     format(vector<vec3>(POINTS, vec3(1, 1, 1))),
                      indices(POINTS)) {
 }

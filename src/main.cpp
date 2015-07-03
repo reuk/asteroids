@@ -57,10 +57,7 @@ public:
         , bullet_graphic(generic_shader)
         , ship(ship_graphic, bullet_graphic)
         , life_counter(ship_graphic, 0.03, vec2(-0.9, -0.9))
-        , score_handler(text_shader, vec2(-0.9, -0.91))
-        , title_handler(text_shader, vec2(-0.9, 0.7))
-        , press_space_handler(text_shader, vec2(-0.9, 0.6))
-        , game_over_handler(text_shader, vec2(-0.9, 0.7))
+        , text_handler(text_shader)
         , lives(max_lives)
         , score(0)
         , state(GameState::TITLE) {
@@ -269,12 +266,13 @@ public:
             stringstream ss;
             ss << setw(8) << score_string;
 
-            score_handler.draw(ss.str(), 20);
+            text_handler.draw(ss.str(), 20, vec2(-0.9, -0.91));
         } else if (state == GameState::TITLE) {
-            title_handler.draw("asteroids", 50);
-            press_space_handler.draw("press space to start", 20);
+            text_handler.draw("asteroids", 50, vec2(-0.9, 0.7));
+            text_handler.draw("press space to start", 20, vec2(-0.9, 0.6));
         } else if (state == GameState::OVER) {
-            game_over_handler.draw("game over", 50);
+            text_handler.draw("game over", 50, vec2(-0.9, 0.7));
+            text_handler.draw("press space to retry", 20, vec2(-0.9, 0.6));
         }
 
         Program::unuse();
@@ -396,10 +394,7 @@ private:
     vector<ParticleSystem> particle_system;
 
     LifeCounter life_counter;
-    TextHandler score_handler;
-    TextHandler title_handler;
-    TextHandler press_space_handler;
-    TextHandler game_over_handler;
+    TextHandler text_handler;
 
     static const int max_lives;
     int lives;

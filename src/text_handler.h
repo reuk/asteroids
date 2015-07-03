@@ -11,17 +11,16 @@
 
 class TextHandler {
 public:
-    TextHandler(TextShader & shader_program, const glm::vec2 & position);
+    TextHandler(TextShader & shader_program);
     virtual ~TextHandler();
 
-    void draw(const std::string & s, int pixel_height) const;
+    void draw(const std::string & s, int pixel_height, const glm::vec2 & position) const;
     float measure(const std::string & s, int pixel_height) const;
 
 private:
     void configure_vao() const;
 
     TextShader & shader_program;
-    glm::vec2 position;
 
     FT_Library library;
     FT_Face face;

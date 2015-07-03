@@ -100,7 +100,7 @@ vector<vec3> point_geometry(const vector<Particle> &v) {
 vector<vec3> point_colors(const vector<Particle> &v) {
     vector<vec3> ret(v.size());
     transform(v.begin(), v.end(), ret.begin(),
-              [](auto i) { return vec3(0.0f, i.lifetime, i.lifetime); });
+              [](auto i) { return vec3(1.0) * i.lifetime; });
     return ret;
 }
 

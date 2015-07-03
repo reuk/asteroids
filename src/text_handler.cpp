@@ -7,9 +7,8 @@
 using namespace std;
 using namespace glm;
 
-TextHandler::TextHandler(TextShader & shader_program, const vec2 & position)
-    : shader_program(shader_program)
-    , position(position) {
+TextHandler::TextHandler(TextShader & shader_program)
+    : shader_program(shader_program) {
     auto error = FT_Init_FreeType(&library);
 
     if (error) {
@@ -29,7 +28,7 @@ TextHandler::~TextHandler() {
     error = FT_Done_FreeType(library);
 }
 
-void TextHandler::draw(const string & s, int pixel_height) const {
+void TextHandler::draw(const string & s, int pixel_height, const vec2 & position) const {
     FT_Set_Pixel_Sizes(face, 0, pixel_height);
 
     auto pos = position;

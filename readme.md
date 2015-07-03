@@ -14,15 +14,16 @@ Done
 * Particle effects when an asteroid splits
 * Score counter
 * Find a way of bundling the score counter font into the app
+* Proper delta-time operation rather than per-frame
+* Title screen
+* Automatically generate asteroids
 
 Todo
 ====
 
-* Proper delta-time operation rather than per-frame
 * Tweak spaceship physics/controls
-* Title screen and game over/leaderboard
+* Leaderboard
 * Powerups + bonuses
-* Automatically generate asteroids
 
 Maybe
 =====
