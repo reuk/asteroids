@@ -5,8 +5,10 @@
 #include "windowed_app.h"
 #include "bullet.h"
 #include "bullet_graphic.h"
+#include "key_timer.h"
 
 #include <random>
+#include <map>
 
 class Ship : public SpaceObject, public WindowedApp::Listener {
 public:
@@ -17,6 +19,8 @@ public:
 
     Ship(ShipGraphic &ship_graphic, BulletGraphic &bullet_graphic);
 
+    void update(float dt) override;
+
     void resize(const glm::vec2 &v) override;
     void error(const std::string &s) override;
     void key(int key, int scancode, int action, int mods) override;
@@ -24,19 +28,15 @@ public:
     void add_listener(Listener *listener);
     void remove_listener(Listener *listener);
 
-    void set_life(float life);
-    float get_life() const;
-
 private:
     glm::vec2 forward_vector() const;
 
-    glm::vec2 forward() const;
-    glm::vec2 backward() const;
-    float left() const;
-    float right() const;
-    void fire();
+    void forward(float dt);
+    void backward(float dt);
+    void left(float dt);
+    void right(float dt);
 
-    float life;
+    void fire();
 
     ListenerList<Listener> listener_list;
 
@@ -45,4 +45,6 @@ private:
     std::uniform_real_distribution<float> delta_distribution;
 
     StaticDrawable *bullet_graphic;
+
+    std::map<int, std::pair<KeyTimer, decltype(&Ship::forward)>> key_timer;
 };

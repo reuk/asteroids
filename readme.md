@@ -17,11 +17,11 @@ Done
 * Proper delta-time operation rather than per-frame
 * Title screen
 * Automatically generate asteroids
+* Tweak spaceship physics/controls
 
 Todo
 ====
 
-* Tweak spaceship physics/controls
 * Leaderboard
 * Powerups + bonuses
 

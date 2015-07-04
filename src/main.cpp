@@ -317,6 +317,7 @@ public:
         lives = max_lives;
         score = 0;
         state = GameState::PLAYING;
+        add_asteroid();
     }
 
     void stop_game() {
