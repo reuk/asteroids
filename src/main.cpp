@@ -440,4 +440,5 @@ int main() {
         Logger::log_err("program encountered unknown error");
         return 1;
     }
+    return 0;
 }
