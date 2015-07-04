@@ -3,6 +3,12 @@ Asteroids
 
 A little version of Asteroids in C++14 using just GLFW, GLEW, and GLM.
 
+Screenshots
+===========
+
+![Playing](/screenshots/playing.png?raw=true "Playing")
+![Paused](/screenshots/paused.png?raw=true "Paused")
+
 Done
 ====
 
