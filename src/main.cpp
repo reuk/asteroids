@@ -256,7 +256,7 @@ public:
 
         text_shader.use();
 
-        if (state == GameState::PLAYING) {
+        if (state == GameState::PLAYING || state == GameState::PAUSED) {
             auto score_string = to_string(score);
             stringstream ss;
             ss << setw(8) << score_string;
@@ -268,7 +268,9 @@ public:
         } else if (state == GameState::OVER) {
             text_handler.draw("game over", 50, vec2(-0.9, 0.7));
             text_handler.draw("press space to retry", 20, vec2(-0.9, 0.6));
-        } else if (state == GameState::PAUSED) {
+        }
+
+        if (state == GameState::PAUSED) {
             text_handler.draw("game paused", 50, vec2(-0.9, 0.7));
             text_handler.draw("press p to resume", 20, vec2(-0.9, 0.6));
         }
