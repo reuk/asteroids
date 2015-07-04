@@ -17,11 +17,11 @@ Ship::Ship(ShipGraphic &ship_graphic, BulletGraphic &bullet_graphic)
     , delta_distribution(-0.1, 0.1)
     , bullet_graphic(&bullet_graphic)
     , key_timer({
-            {GLFW_KEY_W, make_pair(KeyTimer(), &Ship::forward)},
-            {GLFW_KEY_S, make_pair(KeyTimer(), &Ship::backward)},
-            {GLFW_KEY_A, make_pair(KeyTimer(), &Ship::left)},
-            {GLFW_KEY_D, make_pair(KeyTimer(), &Ship::right)},
-        }) {
+          {GLFW_KEY_W, make_pair(KeyTimer(), &Ship::forward)},
+          {GLFW_KEY_S, make_pair(KeyTimer(), &Ship::backward)},
+          {GLFW_KEY_A, make_pair(KeyTimer(), &Ship::left)},
+          {GLFW_KEY_D, make_pair(KeyTimer(), &Ship::right)},
+      }) {
 }
 
 glm::vec2 Ship::forward_vector() const {
@@ -64,7 +64,7 @@ void Ship::remove_listener(Listener *listener) {
 }
 
 void Ship::update(float dt) {
-    for (auto && i : key_timer) {
+    for (auto &&i : key_timer) {
         if (i.second.first.get_state() == GLFW_PRESS) {
             (this->*(i.second.second))(i.second.first.get_elapsed_time());
             i.second.first.reset();

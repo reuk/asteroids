@@ -11,7 +11,8 @@ auto key_dispatch(Obj obj, const std::map<int, T> &triggers, int key) {
 }
 
 template <typename T, typename Obj, typename... Ts>
-auto key_dispatch(Obj obj, const std::map<int, T> &triggers, int key, Ts&&... ts) {
+auto key_dispatch(Obj obj, const std::map<int, T> &triggers, int key,
+                  Ts &&... ts) {
     auto in = triggers.find(key);
     if (in != triggers.end()) {
         (obj->*(in->second))(ts...);
