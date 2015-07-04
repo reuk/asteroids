@@ -22,6 +22,7 @@ Done
 Todo
 ====
 
+* Pause mode
 * Leaderboard
 * Powerups + bonuses
 

@@ -241,7 +241,7 @@ public:
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (state == GameState::PLAYING) {
+        if (state == GameState::PLAYING || state == GameState::PAUSED) {
             ship.draw();
             for (const auto &i : bullets)
                 i.draw();
@@ -268,6 +268,9 @@ public:
         } else if (state == GameState::OVER) {
             text_handler.draw("game over", 50, vec2(-0.9, 0.7));
             text_handler.draw("press space to retry", 20, vec2(-0.9, 0.6));
+        } else if (state == GameState::PAUSED) {
+            text_handler.draw("game paused", 50, vec2(-0.9, 0.7));
+            text_handler.draw("press p to resume", 20, vec2(-0.9, 0.6));
         }
 
         Program::unuse();
@@ -325,6 +328,14 @@ public:
         state = GameState::OVER;
     }
 
+    void pause_game() {
+        state = GameState::PAUSED;
+    }
+
+    void resume_game() {
+        state = GameState::PLAYING;
+    }
+
     void key(int key, int scancode, int action, int mods) override {
         if (!(action == GLFW_PRESS || action == GLFW_REPEAT))
             return;
@@ -339,20 +350,26 @@ public:
                     key);
                 break;
             case GameState::PLAYING:
-                /*
-                key_dispatch<decltype(&Asteroids::add_asteroid)>(
+                key_dispatch<decltype(&Asteroids::pause_game)>(
                     this,
                     {
-                        {GLFW_KEY_N, &Asteroids::add_asteroid},
+                        {GLFW_KEY_P, &Asteroids::pause_game},
                     },
                     key);
-                */
                 break;
             case GameState::OVER:
                 key_dispatch<decltype(&Asteroids::start_game)>(
                     this,
                     {
                         {GLFW_KEY_SPACE, &Asteroids::start_game},
+                    },
+                    key);
+                break;
+            case GameState::PAUSED:
+                key_dispatch<decltype(&Asteroids::resume_game)>(
+                    this,
+                    {
+                        {GLFW_KEY_P, &Asteroids::resume_game},
                     },
                     key);
                 break;
