@@ -14,7 +14,7 @@ vector<GLushort> indices(int points) {
 
 vector<GLfloat> format(const vector<vec3> &points) {
     vector<GLfloat> ret(points.size() * 3);
-    for (auto i = 0; i != points.size(); ++i) {
+    for (auto i = 0u; i != points.size(); ++i) {
         auto ret_index = i * 3;
         ret[ret_index + 0] = points[i].x;
         ret[ret_index + 1] = points[i].y;

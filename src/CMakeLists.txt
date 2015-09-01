@@ -28,12 +28,20 @@ set(GLFW_USE_RETINA true)
 
 add_executable(${name} MACOSX_BUNDLE ${sources})
 
-target_link_libraries(
-    ${name}
+set(libraries
     ${OPENGL_LIBRARIES}
     ${GLEW_LIBRARY}
     ${GLFW_STATIC_LIBRARIES}
     ${FREETYPE_LIBRARIES})
+
+if(UNIX)
+    set(libraries ${libraries} png z)
+    file(COPY Hyperspace.otf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif(UNIX)
+
+target_link_libraries(
+    ${name}
+    ${libraries})
 
 install(TARGETS ${name}
     BUNDLE DESTINATION . COMPONENT Runtime
