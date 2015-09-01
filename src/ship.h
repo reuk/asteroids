@@ -10,13 +10,12 @@
 #include <random>
 #include <map>
 
-class Ship : public SpaceObject, public WindowedApp::Listener {
-public:
-    class Listener {
-    public:
-        virtual void ship_gun_fired(Bullet &&bullet) = 0;
-    };
+struct ShipListener {
+    virtual void ship_gun_fired(Bullet &&bullet) = 0;
+};
 
+class Ship : public SpaceObject, public WindowedApp::Listener, public ListenerList<ShipListener> {
+public:
     Ship(ShipGraphic &ship_graphic, BulletGraphic &bullet_graphic);
 
     void update(float dt) override;
@@ -24,9 +23,6 @@ public:
     void resize(const glm::vec2 &v) override;
     void error(const std::string &s) override;
     void key(int key, int scancode, int action, int mods) override;
-
-    void add_listener(Listener *listener);
-    void remove_listener(Listener *listener);
 
 private:
     glm::vec2 forward_vector() const;
@@ -37,8 +33,6 @@ private:
     void right(float dt);
 
     void fire();
-
-    ListenerList<Listener> listener_list;
 
     std::default_random_engine engine;
     std::uniform_real_distribution<float> angle_distribution;

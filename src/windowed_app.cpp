@@ -77,11 +77,11 @@ Window &WindowedApp::get_window() {
 }
 
 void WindowedApp::add_listener(Listener *l) {
-    listener_list.add(l);
+    listener_list.add_listener(l);
 }
 
 void WindowedApp::remove_listener(Listener *l) {
-    listener_list.remove(l);
+    listener_list.remove_listener(l);
 }
 
 vec2 WindowedApp::size(500, 500);

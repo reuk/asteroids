@@ -19,10 +19,10 @@ public:
             (i->*f)(std::forward<Values>(values)...);
     }
 
-    inline void add(Ptr ptr) {
+    inline void add_listener(Ptr ptr) {
         listener.insert(ptr);
     }
-    inline void remove(Ptr ptr) {
+    inline void remove_listener(Ptr ptr) {
         listener.erase(ptr);
     }
 

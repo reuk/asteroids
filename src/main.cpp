@@ -35,7 +35,7 @@ using namespace glm;
 
 class Asteroids : public WindowedApp,
                   public WindowedApp::Listener,
-                  public Ship::Listener {
+                  public ShipListener {
 public:
     enum class GameState { TITLE, PLAYING, PAUSED, OVER };
 

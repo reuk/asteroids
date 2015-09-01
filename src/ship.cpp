@@ -51,16 +51,9 @@ void Ship::fire() {
     auto ang = angle_distribution(engine);
     auto del = delta_distribution(engine);
 
-    listener_list.call(
-        &Listener::ship_gun_fired,
+    call(
+        &ShipListener::ship_gun_fired,
         Bullet(*bullet_graphic, Mover<vec2>(pos, vel), Mover<float>(ang, del)));
-}
-
-void Ship::add_listener(Listener *listener) {
-    listener_list.add(listener);
-}
-void Ship::remove_listener(Listener *listener) {
-    listener_list.remove(listener);
 }
 
 void Ship::update(float dt) {
